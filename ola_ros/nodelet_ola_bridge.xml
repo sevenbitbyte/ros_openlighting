@@ -1,0 +1,7 @@
+<library path="lib/libnodelet_ola_bridge">
+  <class name="ola_ros/OlaBridge" type="ola_ros::OlaBridge" base_class_type="nodelet::Nodelet">
+    <description> 
+      A node to wrap most functionality of an OlaClient.
+    </description>
+  </class>
+</library>

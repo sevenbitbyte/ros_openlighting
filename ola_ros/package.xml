@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<package>
+  <name>ola_ros</name>
+  <version>0.1.0</version>
+  <description>This package contains ROS wrappers of OLA functionality</description>
+  <maintainer email="alan.meekins@gmail.com">Alan Meekins</maintainer>
+  <license>BSD</license>
+  <url type="website">http://ros.org/wiki/ros_ola</url>
+  <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>nodelet</build_depend>
+  <build_depend>roscpp</build_depend>
+  <build_depend>std_msgs</build_depend>
+  <build_depend>lighting_msgs</build_depend>
+
+  <run_depend>nodelet</run_depend>
+  <run_depend>roscpp</run_depend>
+  <run_depend>std_msgs</run_depend>
+  <run_depend>lighting_msgs</run_depend>
+
+  <export>
+    <nodelet plugin="${prefix}/nodelet_ola_bridge.xml"/>
+  </export>
+</package>
