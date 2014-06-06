@@ -1,7 +1,19 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(ola_ros)
 
-find_package(catkin REQUIRED COMPONENTS nodelet roscpp std_msgs lighting_msgs)
+find_package(catkin REQUIRED COMPONENTS lighting_msgs roscpp rospy std_msgs genmsg)
+
+#set(CMAKE_BUILD_TYPE Debug)
+set(ROS_BUILD_TYPE Debug)
+#set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall -ggdb")
+
+
+catkin_package(
+  INCLUDE_DIRS include
+ # LIBRARIES nodelet_ola_bridge
+  CATKIN_DEPENDS lighting_msgs nodelet roscpp std_msgs
+)
+
 
 ## Find protobuf
 include(FindProtobuf)
@@ -13,17 +25,12 @@ find_package(Qt5Gui REQUIRED)
 find_package(Qt5Sql REQUIRED)
 find_package(Qt5Network REQUIRED)
 
-set(CMAKE_BUILD_TYPE Debug)
-set(ROS_BUILD_TYPE Reslease)
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall -ggdb")
+set(CMAKE_AUTOMOC ON)
+
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+INCLUDE_DIRECTORIES( ${CMAKE_CURRENT_BINARY_DIR} )
 
 
-
-catkin_package(
-  INCLUDE_DIRS include
-  LIBRARIES nodelet_ola_bridge
-  CATKIN_DEPENDS nodelet roscpp std_msgs lighting_msgs
-)
 
 ## Setup include directories
 include_directories(
@@ -38,43 +45,71 @@ include_directories(
 
 add_definitions(${Qt5Widgets_DEFINITIONS})
 
-set(OLA_BRIDGE_SOURCE
+set(OLA_BRIDGE_NODELET_SOURCE
   src/utils.cpp
   src/ledrun.cpp
   src/olamanager.cpp
-  src/ola_bridge.cpp
+  src/ola_bridge_nodelet.cpp
 )
 
-set(OLA_BRIDGE_HEADERS
-  src/utils.h
-  src/ledrun.h
-  src/olamanager.h
-  include/ola_bridge.h
+set(OLA_BRIDGE_NODELET_HEADERS
+  include/utils.h
+  include/ledrun.h
+  include/olamanager.h
+  include/ola_bridge_nodelet.h
+)
+
+set(OLA_BRIDGE_NODE_SOURCE
+  src/ola_bridge_node.cpp
+  src/utils.cpp
+  src/ledrun.cpp
+  src/olamanager.cpp
+)
+
+set(OLA_BRIDGE_NODE_HEADERS
+  include/utils.h
+  include/ledrun.h
+  include/olamanager.h
 )
 
 
-## Create the nodelet tutorial library
-add_library(nodelet_ola_bridge ${OLA_BRIDGE_SOURCE})
+## Create node binaries
+add_executable(ola_bridge_node ${OLA_BRIDGE_NODE_SOURCE})
 
-target_link_libraries(nodelet_ola_bridge
+target_link_libraries(ola_bridge_node
   ${catkin_LIBRARIES}
   ola
   olacommon
   ${PROTOBUF_LIBRARY}
 )
 
-qt5_use_modules(nodelet_ola_bridge Core Gui Widgets Sql Network)
+add_dependencies(ola_bridge_node lighting_msgs_gencpp)
+
+qt5_use_modules(ola_bridge_node Core Gui Widgets Sql Network)
+
+
+## Create the nodelet library
+#add_library(ola_bridge_nodelet ${OLA_BRIDGE_NODELET_SOURCE})
+
+#target_link_libraries(ola_bridge_nodelet
+#  ${catkin_LIBRARIES}
+#  ola
+#  olacommon
+#  ${PROTOBUF_LIBRARY}
+#)
+
+#qt5_use_modules(ola_bridge_nodelet Core Gui Widgets Sql Network)
 
 if(catkin_EXPORTED_LIBRARIES)
-  add_dependencies(nodelet_ola_bridge ${catkin_EXPORTED_LIBRARIES})
+ # add_dependencies(ola_bridge_nodelet ${catkin_EXPORTED_LIBRARIES})
 endif()
 
 ## Mark the nodelet library for installations
-install(TARGETS nodelet_ola_bridge
+install(TARGETS ola_bridge_node
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
 ## Mark other files for installation (e.g. launch and bag files, etc.)
-install(FILES nodelet_ola_bridge.xml
+install(FILES ola_bridge_nodelet.xml
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})

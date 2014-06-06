@@ -1,4 +1,2 @@
-duration latency
 int16 frameRate
-int16 activeAnimations
-
+int16 command_count

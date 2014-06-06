@@ -4,17 +4,22 @@
 #include <QtCore>
 #include <QtGui>
 
+
+#include <ros/ros.h>
+#include <ros/console.h>
+
 #include <ola/DmxBuffer.h>
 #include <ola/Logging.h>
 #include <ola/StreamingClient.h>
 
 #include "utils.h"
 
-class OlaManager : public QObject
+class OlaManager/* : public QObject*/
 {
-    Q_OBJECT
+    /*Q_OBJECT*/
     public:
-        explicit OlaManager(QObject *parent = 0);
+        /*explicit*/ OlaManager(/*QObject *parent = 0*/);
+        ~OlaManager();
 
         void updateBuffers(QMap<int,ola::DmxBuffer> data);
         void updateBuffer(int universe, ola::DmxBuffer& data);

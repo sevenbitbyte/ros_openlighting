@@ -4,8 +4,8 @@
 #include <ola/Logging.h>
 #include <ola/StreamingClient.h>
 
-OlaManager::OlaManager(QObject *parent) :
-    QObject(parent)
+OlaManager::OlaManager(/*QObject *parent*/) /*:
+    QObject(parent)*/
 {
 
     // turn on OLA logging
@@ -21,6 +21,9 @@ OlaManager::OlaManager(QObject *parent) :
 
 }
 
+OlaManager::~OlaManager() {
+    //
+}
 
 void OlaManager::sendBuffers(){
     QMap<int,ola::DmxBuffer*>::const_iterator iter = _buffers.constBegin();
@@ -108,7 +111,5 @@ void OlaManager::updateBuffer(int universe, ola::DmxBuffer& data){
 
     _buffers[universe] = buffer;
 }
-
-
 
 
