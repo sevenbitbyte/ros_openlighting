@@ -74,6 +74,9 @@ set(OLA_BRIDGE_NODE_HEADERS
   include/ola_bridge.h
 )
 
+set(DMX_TEST_NODE_SOURCE
+  src/dmx_test.cpp
+)
 
 ## Create node binaries
 add_executable(ola_bridge_node ${OLA_BRIDGE_NODE_SOURCE})
@@ -89,6 +92,14 @@ add_dependencies(ola_bridge_node lighting_msgs_gencpp)
 
 qt5_use_modules(ola_bridge_node Core Gui Widgets Sql Network)
 
+## Create node binaries
+add_executable(dmx_test ${DMX_TEST_NODE_SOURCE})
+
+target_link_libraries(dmx_test
+  ${catkin_LIBRARIES}
+)
+
+add_dependencies(dmx_test lighting_msgs_gencpp)
 
 ## Create the nodelet library
 #add_library(ola_bridge_nodelet ${OLA_BRIDGE_NODELET_SOURCE})

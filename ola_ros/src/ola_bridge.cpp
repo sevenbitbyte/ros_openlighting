@@ -13,6 +13,7 @@ OlaBridge::~OlaBridge() {
 
 void OlaBridge::renderCallback(const ros::TimerEvent& event) {
     render();
+    _ola.sendBuffers();
 }
 
 void OlaBridge::renderDmxValue(lighting_msgs::DmxValue value) {

@@ -13,7 +13,7 @@ ros::NodeHandlePtr _nhPtr;
 
 int main(int argc, char** argv){
 
-    ros::init(argc, argv, "ola_bridge_node");
+    ros::init(argc, argv, "ola_bridge");
     _nhPtr = ros::NodeHandlePtr(new ros::NodeHandle("~"));
 
     OlaBridge olaBridge(_nhPtr);
