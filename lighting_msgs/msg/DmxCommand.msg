@@ -7,6 +7,6 @@ int8 LOAD=5        # Load stored command from disk
 
 int8 action
 string name
-DmxFrame[] frames
+DmxFrame[] layers
 bool loop
 string next

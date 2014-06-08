@@ -1,53 +1,41 @@
 #ifndef OLA_BRIDGE_H
 #define OLA_BRIDGE_H
 
-#include <pluginlib/class_list_macros.h>
-#include <nodelet/nodelet.h>
 #include <ros/ros.h>
+#include <ros/console.h>
 
-#include <std_msgs/Float64.h>
-#include <lighting_msgs/DmxValue.h>
-#include <lighting_msgs/DmxFrame.h>
-#include <lighting_msgs/DmxEasing.h>
-#include <lighting_msgs/DmxCommand.h>
+#include "olamanager.h"
+#include "lighting_msgs/run_command.h"
 
-#include <ola/Callback.h>
-#include <ola/Clock.h>
-#include <ola/DmxBuffer.h>
-#include <ola/Logging.h>
-#include <ola/OlaClientWrapper.h>
-#include <ola/base/Flags.h>
-#include <ola/base/Init.h>
-#include <ola/thread/SignalThread.h>
+class OlaBridge {
+    private:
+        ros::NodeHandlePtr _nhPtr;
+        ros::ServiceServer _cmdSrv;
+        OlaManager _ola;
 
-namespace ola_ros {
-    class OlaBridge : public nodelet::Nodelet {
-        public:
-            OlaBridge();
+        ros::Timer _loopTimer;
+        QMap<std::string, lighting_msgs::DmxCommand> _commandBuffer;
+        lighting_msgs::DmxCommand _currentCommand;
+        QDateTime _commandStartTime;
 
-        private:
-            virtual void onInit();
+        /*bool _displayEnable;
 
-            void callback(const std_msgs::Float64::ConstPtr& input);
+        lighting_msgs::DmxCommand _displayCmd;
+        QDateTime _displayStartTime;*/
 
-            void dmxCallback(const lighting_msgs::DmxValue::ConstPtr& input);
-            void frameCallback(const lighting_msgs::DmxFrame::ConstPtr& input);
+    public:
+        OlaBridge(ros::NodeHandlePtr ptr);
+        ~OlaBridge();
 
-            ros::Subscriber _valueSub;
-            ros::Subscriber _frameSub;
-            ros::Publisher _frameStatusPub;
-            ros::Publisher _valuePub;
+        void render();
 
-            ros::Publisher pub;
-            ros::Subscriber sub;
-            double value_;
+    protected:
+        bool processCommand(lighting_msgs::run_command::Request& req, lighting_msgs::run_command::Response& res);
+        void renderCallback(const ros::TimerEvent& event);
 
-            ola::OlaCallbackClientWrapper _client;
-    };
-
-    //PLUGINLIB_EXPORT_CLASS(ola_ros::OlaBridge, nodelet::Nodelet);
-    PLUGINLIB_DECLARE_CLASS(ola_ros, OlaBridge, ola_ros::OlaBridge, nodelet::Nodelet);
-}
-
+        int renderCmd(lighting_msgs::DmxCommand cmd, QDateTime start, QDateTime now);
+        void renderDmxValue(lighting_msgs::DmxValue value);
+        void renderDmxEasing(lighting_msgs::DmxEasing easing, qreal progress);
+};
 
 #endif  //OLA_BRIDGE_H

@@ -64,12 +64,14 @@ set(OLA_BRIDGE_NODE_SOURCE
   src/utils.cpp
   src/ledrun.cpp
   src/olamanager.cpp
+  src/ola_bridge.cpp
 )
 
 set(OLA_BRIDGE_NODE_HEADERS
   include/utils.h
   include/ledrun.h
   include/olamanager.h
+  include/ola_bridge.h
 )
 
 

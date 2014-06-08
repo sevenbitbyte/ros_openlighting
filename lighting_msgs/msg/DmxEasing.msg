@@ -1,5 +1,6 @@
 DmxValue[] start
 DmxValue[] end
+duration delay
 duration duration
 uint8 curve
 
