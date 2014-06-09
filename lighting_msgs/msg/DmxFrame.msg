@@ -1,4 +1,4 @@
 DmxValue[] values
 DmxEasing[] easings
-duration delay
-duration duration
+uint32 delayMs
+uint32 durationMs

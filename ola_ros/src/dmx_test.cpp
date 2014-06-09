@@ -3,8 +3,8 @@
 
 #include "lighting_msgs/run_command.h"
 
-#define TRANSITION_SEC (2.0f)
-#define FADE_TIME (5.0f)
+#define TRANSITION_MS (2000.0f)
+#define FADE_TIME_MS (5000.0f)
 
 using namespace std;
 
@@ -14,8 +14,8 @@ lighting_msgs::DmxCommand renderSnake(int universe) {
     lighting_msgs::DmxCommand dispCmd;
     for(int i=0; i<512; i++){
         lighting_msgs::DmxFrame f;
-        f.delay.fromSec( i * TRANSITION_SEC );
-        f.duration.fromSec( FADE_TIME );
+        f.delayMs = ( i * TRANSITION_MS );
+        f.durationMs = ( FADE_TIME_MS );
 
         if(i > 0){
             //Setup static values
@@ -27,8 +27,8 @@ lighting_msgs::DmxCommand renderSnake(int universe) {
         }
 
         lighting_msgs::DmxEasing fadeIn;
-        fadeIn.delay.fromSec(0.0f);
-        fadeIn.duration.fromSec(FADE_TIME);
+        fadeIn.delayMs = 0;
+        fadeIn.durationMs = (FADE_TIME_MS);
         fadeIn.curve = lighting_msgs::DmxEasing::Linear;
 
         lighting_msgs::DmxValue fadeValue;

@@ -39,10 +39,9 @@ ROSUtils.MessageFactory.prototype.getMessageDetails = function(){
 ROSUtils.MessageFactory.prototype.getMessageDetailsCallback = function(that){
   return function(details){
     //Create constructor functions
-
+    console.log(details);
     for(var idx in details){
       (function(detail){
-
       var fieldList=details[idx].fieldnames;
       var typeList=details[idx].fieldtypes;
       var exampleList=details[idx].examples;
@@ -57,6 +56,11 @@ ROSUtils.MessageFactory.prototype.getMessageDetailsCallback = function(that){
               var fieldName = fieldList[fIdx];
               var fieldExample = exampleList[fIdx];
 
+              if(fieldExample == '[]'){
+                this[fieldName] = [];
+                continue;
+              }
+
               if(fieldType == 'string'){
                 this[fieldName] = String();
               }
@@ -69,9 +73,6 @@ ROSUtils.MessageFactory.prototype.getMessageDetailsCallback = function(that){
               else if(fieldType.length > 0){
                 if(fieldExample == '{}'){
                   this[fieldName] = that.createMessage(fieldType);
-                }
-                else{
-                  this[fieldName] = [];
                 }
               }
               else{

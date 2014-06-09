@@ -57,8 +57,8 @@ int OlaBridge::renderCmd(lighting_msgs::DmxCommand cmd, QDateTime start, QDateTi
     int activeFrames = 0;
     foreach(lighting_msgs::DmxFrame frame, cmd.layers){
         qreal deltaMs = start.msecsTo(now);
-        qreal delayMs = (frame.delay.toSec() *  1000.0f);
-        qreal durationMs = (frame.duration.toSec() *  1000.0f);
+        qreal delayMs = frame.delayMs;
+        qreal durationMs = frame.durationMs;
 
         qreal progress = (deltaMs - delayMs) / durationMs;
 
@@ -70,8 +70,8 @@ int OlaBridge::renderCmd(lighting_msgs::DmxCommand cmd, QDateTime start, QDateTi
             }
 
             foreach(lighting_msgs::DmxEasing easing, frame.easings) {
-                qreal easingDelayMs = delayMs + (easing.delay.toSec() * 1000.0f);
-                qreal easingDurationMs = easing.duration.toSec() * 1000.0f;
+                qreal easingDelayMs = delayMs + easing.delayMs;
+                qreal easingDurationMs = easing.durationMs;
 
                 qreal easingProgress = (deltaMs - easingDelayMs) / easingDurationMs;
                 renderDmxEasing(easing, easingProgress);
@@ -139,12 +139,20 @@ void OlaBridge::render() {
 bool OlaBridge::processCommand(lighting_msgs::run_command::Request& req, lighting_msgs::run_command::Response& res) {
     QDateTime now = QDateTime::currentDateTimeUtc();
 
+    std::cout<< "Got a command " << (int)req.command.action
+             << " with " << req.command.layers.size() << std::endl;
 
     if(req.command.action == lighting_msgs::DmxCommand::DISPLAY){
         if( !req.command.layers.empty() ){
             //TODO: Validate command
             _currentCommand = req.command;
             _commandStartTime = now;
+
+            std::cout<< "First layer has "
+                     << req.command.layers[0].values.size() << "values "
+                     << req.command.layers[0].easings.size() << "easings "
+                     << (int)req.command.layers[0].durationMs << "duration"
+                     << std::endl;
 
             return true;
         }

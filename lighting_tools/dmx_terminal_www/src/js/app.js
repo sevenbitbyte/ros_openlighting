@@ -175,6 +175,49 @@ function getEventData(canvas, evt) {
 
 var ros;
 var factory;
+var count=0;
+
+var serviceTest = function(){
+  var dmxCmd = factory.createMessage('lighting_msgs/DmxCommand');
+  var frame = factory.createMessage('lighting_msgs/DmxFrame');
+  var dmxValue = factory.createMessage('lighting_msgs/DmxValue');
+
+  dmxValue.universe = 1;
+  dmxValue.offset = 0;
+  for(i=0; i<255; i++){
+    dmxValue.data.push(i);
+  }
+
+  frame.values.push(dmxValue);
+  frame.durationMs = 1000;
+  //frame.duration = {sec: 4, nsec: 0};
+
+  dmxCmd.layers.push(frame);
+
+
+  var OlaCmdClient = new ROSLIB.Service({
+    ros : ros,
+    name : '/ola_bridge/run_cmd',
+    serviceType : 'lighting_msgs/run_command'
+  });
+
+  // Then we create a Service Request. The object we pass in to ROSLIB.ServiceRequest matches the
+  // fields defined in the rospy_tutorials AddTwoInts.srv file.
+  var request = new ROSLIB.ServiceRequest({
+    command : dmxCmd
+  });
+
+  console.log(dmxCmd);
+
+  // Finally, we call the /add_two_ints service and get back the results in the callback. The result
+  // is a ROSLIB.ServiceResponse object.
+  OlaCmdClient.callService(request, function(result) {
+    console.log('Result for service call on ' + OlaCmdClient.name + ': ' + result.status);
+    console.log(result);
+  },
+  function(err){console.log(err);}
+  );
+}
 
 $( document ).ready(function() {
 
@@ -187,6 +230,8 @@ $( document ).ready(function() {
            console.log('connected');
            factory = new ROSUtils.MessageFactory(ros);
            factory.getMessageDetails('lighting_msgs/DmxCommand');
+
+           //setInterval(serviceTest, 2000);
          });
 
   $('body').on('contextmenu', 'canvas#pan-tilt-view', function(e){ return false; });

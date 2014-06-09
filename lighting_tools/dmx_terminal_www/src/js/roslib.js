@@ -632,7 +632,7 @@ ROSLIB.Ros.prototype.getMessageDetails = function(message, callback) {
 ROSLIB.Ros.prototype.decodeTypeDefs = function(type_defs) {
   var typeDefDict = {};
   var theType = type_defs[0];
-  
+
   // It calls itself recursively to resolve type definition
   // using hint_defs.
   var decodeTypeDefsRec = function(theType, hint_defs) {
@@ -674,7 +674,7 @@ ROSLIB.Ros.prototype.decodeTypeDefs = function(type_defs) {
     }
     return typeDefDict;
   };                            // end of decodeTypeDefsRec
-  
+
   return decodeTypeDefsRec(type_defs[0], type_defs);
 };
 
@@ -1771,4 +1771,3 @@ ROSLIB.UrdfVisual = function(options) {
   // Pass it to the XML parser
   initXml(xml);
 };
-

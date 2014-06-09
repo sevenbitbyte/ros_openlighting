@@ -1,7 +1,7 @@
 DmxValue[] start
 DmxValue[] end
-duration delay
-duration duration
+uint32 delayMs
+uint32 durationMs
 uint8 curve
 
 #Easing curve types
