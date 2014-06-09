@@ -3,11 +3,53 @@
 
 #include "lighting_msgs/run_command.h"
 
+#define TRANSITION_SEC (2.0f)
+#define FADE_TIME (5.0f)
 
 using namespace std;
 
 ros::NodeHandlePtr _nhPtr;
 
+lighting_msgs::DmxCommand renderSnake(int universe) {
+    lighting_msgs::DmxCommand dispCmd;
+    for(int i=0; i<512; i++){
+        lighting_msgs::DmxFrame f;
+        f.delay.fromSec( i * TRANSITION_SEC );
+        f.duration.fromSec( FADE_TIME );
+
+        if(i > 0){
+            //Setup static values
+            lighting_msgs::DmxValue staticValue;
+            staticValue.universe = universe;
+            staticValue.offset = 0;
+            staticValue.data.assign(i, 255);
+            f.values.push_back(staticValue);
+        }
+
+        lighting_msgs::DmxEasing fadeIn;
+        fadeIn.delay.fromSec(0.0f);
+        fadeIn.duration.fromSec(FADE_TIME);
+        fadeIn.curve = lighting_msgs::DmxEasing::Linear;
+
+        lighting_msgs::DmxValue fadeValue;
+        fadeValue.universe = universe;
+        fadeValue.offset = i;
+        fadeValue.data.push_back(0);
+        fadeIn.start.push_back(fadeValue);      //Start fade value
+
+        fadeValue.data[0] = 255;
+        fadeIn.end.push_back(fadeValue);        //End fade value
+
+        f.easings.push_back(fadeIn);
+        dispCmd.layers.push_back(f);
+
+        for(int j=0; j<10; j++){
+            dispCmd.layers.push_back(f);
+        }
+    }
+
+    return dispCmd;
+}
 
 int main(int argc, char** argv){
 
@@ -17,7 +59,7 @@ int main(int argc, char** argv){
     u_int16_t universe = 1;
     //_nhPtr->getParam("universe", universe);
 
-    lighting_msgs::DmxCommand dispCmd;
+    /*lighting_msgs::DmxCommand dispCmd;
 
     dispCmd.action = lighting_msgs::DmxCommand::DISPLAY;
     dispCmd.loop = true;
@@ -47,12 +89,12 @@ int main(int argc, char** argv){
     valueTemp.offset += 3;
 
     frame0.values.push_back(valueTemp);
-    dispCmd.layers.push_back(frame0);
+    dispCmd.layers.push_back(frame0);*/
 
     ros::ServiceClient client = _nhPtr->serviceClient<lighting_msgs::run_command::Request>("/ola_bridge/run_cmd");
 
     lighting_msgs::run_command srv;
-    srv.request.command = dispCmd;
+    srv.request.command = renderSnake(1);
 
     if(client.call(srv)){
         std::cout << "Successful call" << std::endl;
