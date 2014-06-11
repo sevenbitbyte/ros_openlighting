@@ -12,7 +12,7 @@ Ui.DmxMoverControl = function(stage, options){
   this.layer = new Kinetic.Layer(options);
 
   console.log("DmxMoverControl() - " + JSON.stringify(options));
-  console.log(this.layer);
+  //console.log(this.layer);
 
   var config = {
     x: this.margins.outer.x,
@@ -57,6 +57,10 @@ Ui.DmxMoverControl = function(stage, options){
   // Intensity
   config.y += config.height + this.margins.inner.y;
   this.whiteBar = new Ui.InputBar(this.stage, config);
+
+  //this.whiteBar.interiorRect.setAttrs( {'fill': 'red' } );
+  //this.polarInput.hoverOutsideCircle.setAttrs( {'stroke': 'red' } );
+
   this.addGroup(this.whiteBar.group);
 
   this.setupEventHandlers();
@@ -66,7 +70,7 @@ Ui.DmxMoverControl = function(stage, options){
 
 Ui.DmxMoverControl.prototype.update = function(){
   this.layer.draw();
-  console.log("DmxMoverControl - draw");
+  //console.log("DmxMoverControl - draw");
 }
 
 

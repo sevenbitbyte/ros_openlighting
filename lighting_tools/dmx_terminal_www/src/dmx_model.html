@@ -1,0 +1,65 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <style>
+      body {
+        margin: 0px;
+        padding: 0px;
+      }
+    </style>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+
+    <script type="text/javascript" src="js/lib/jquery-2.1.1.js"></script>
+    <script type="text/javascript" src="js/lib/kinetic-v5.1.0.js"></script>
+    <script type="text/javascript" src="js/lib/eventemitter2.js"></script>
+    <script type="text/javascript" src="js/lib/tinycolor.js"></script>
+    <script type="text/javascript" src="js/lib/roslib.js"></script>
+    <script type="text/javascript" src="js/message_factory.js"></script>
+    <script type="text/javascript" src="js/dmx.js"></script>
+  </head>
+
+
+  <body style="overflow: hidden" bgcolor='black'>
+    <center>
+      <div id="polarinput-0" class="stage"></div>
+    </center>
+
+    <script>
+      $( document ).ready(function() {
+        document.body.addEventListener('touchmove', function(event) {
+          event.preventDefault();
+        }, false);
+      });
+    </script>
+
+<script>
+var dev;
+var f1;
+var f2;
+
+
+$( document ).ready(function() {
+
+  Dmx.emitter.on('change.Device.*', function(value){
+    console.log(this.event);
+    console.log(value);
+  });
+
+  dev = new Dmx.Device({name:'mover-01'});
+
+  f1 = new Dmx.Field();
+  f1.name = 'field1';
+
+  f2 = new Dmx.Field();
+  f2.name = 'field2';
+
+  dev.template.addField(f1);
+  dev.template.addField(f2);
+
+  dev.setField('field1', 0.5);
+});
+</script>
+
+  </body>
+</html>

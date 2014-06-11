@@ -11,10 +11,10 @@ Ui.InputBar = function(stage, options){
   this.group = new Kinetic.Group(options);
 
   console.log("InputBar() - " + JSON.stringify(options));
-  console.log(this.group);
+  //console.log(this.group);
 
   //Exterior
-  this._rect1 = new Kinetic.Rect({
+  this.exteriorRect = new Kinetic.Rect({
     x: this.margins.outer.x,
     y: this.margins.outer.y,
     width: this.group.width() - (2*this.margins.outer.x),
@@ -25,21 +25,19 @@ Ui.InputBar = function(stage, options){
     cornerRadius: 0.0
   });
 
-  console.log(this._rect1.y());
-
   //Interior
-  this._rect2 = new Kinetic.Rect({
-    x: this._rect1.x() + this.margins.inner.x,
-    y: this._rect1.y() + this.margins.inner.y,
-    width: (this._rect1.width() - (2*this.margins.inner.x)) * this.value,
-    height: this._rect1.height() - (2*this.margins.inner.y),
+  this.interiorRect = new Kinetic.Rect({
+    x: this.exteriorRect.x() + this.margins.inner.x,
+    y: this.exteriorRect.y() + this.margins.inner.y,
+    width: (this.exteriorRect.width() - (2*this.margins.inner.x)) * this.value,
+    height: this.exteriorRect.height() - (2*this.margins.inner.y),
     fill: '#B2E9E2',
     shadowEnabled: false,
     cornerRadius: 0.0
   });
 
-  this.group.add(this._rect1);
-  this.group.add(this._rect2);
+  this.group.add(this.exteriorRect);
+  this.group.add(this.interiorRect);
 
   this._click_started = false;
   this.group.on('mousedown touchstart',
@@ -113,15 +111,15 @@ this._wireframe = new Kinetic.Rect({
 }
 
 Ui.InputBar.prototype.update = function(){
-  this._rect1.x(this.margins.outer.x);
-  this._rect1.y(this.margins.outer.y);
-  this._rect1.width(this.group.width() - (2*this.margins.outer.x));
-  this._rect1.height(this.group.height()  - (2*this.margins.outer.y));
+  this.exteriorRect.x(this.margins.outer.x);
+  this.exteriorRect.y(this.margins.outer.y);
+  this.exteriorRect.width(this.group.width() - (2*this.margins.outer.x));
+  this.exteriorRect.height(this.group.height()  - (2*this.margins.outer.y));
 
-  this._rect2.x(this._rect1.x() + this.margins.inner.x);
-  this._rect2.y(this._rect1.y() + this.margins.inner.y);
-  this._rect2.width((this._rect1.width() - (2*this.margins.inner.x)) * this.value);
-  this._rect2.height(this._rect1.height() - (2*this.margins.inner.y));
+  this.interiorRect.x(this.exteriorRect.x() + this.margins.inner.x);
+  this.interiorRect.y(this.exteriorRect.y() + this.margins.inner.y);
+  this.interiorRect.width((this.exteriorRect.width() - (2*this.margins.inner.x)) * this.value);
+  this.interiorRect.height(this.exteriorRect.height() - (2*this.margins.inner.y));
 
   this.group.draw();
   this.layer.draw();

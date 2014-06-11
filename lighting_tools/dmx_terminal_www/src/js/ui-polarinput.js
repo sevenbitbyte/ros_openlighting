@@ -17,7 +17,7 @@ Ui.PolarInput = function(stage, options){
   this.group = new Kinetic.Group(options);
 
   console.log("PolarInput() - " + JSON.stringify(options));
-  console.log(this.group);
+  //console.log(this.group);
 
   this.radius = Math.min(this.group.width(), this.group.height())/2;
   this.center = {
@@ -70,6 +70,7 @@ Ui.PolarInput = function(stage, options){
   return this;
 }
 
+
 Ui.PolarInput.prototype.update = function(){
   this.outsideCircle.setAttrs({
     x: this.center.x,
@@ -120,7 +121,6 @@ Ui.PolarInput.prototype.inputEndCallback = function(evt){
 }
 
 Ui.PolarInput.prototype.hoverCallback = function(evt){
-  console.log(evt.evt);
 
   var pos = this.stage.getPointerPosition();
   pos.x -= (this.group.getLayer().x() + this.group.x());
@@ -138,18 +138,10 @@ Ui.PolarInput.prototype.hoverCallback = function(evt){
 
 Ui.PolarInput.prototype.setupEventHandlers = function(){
   this.group.on('mousemove touchmove',
-    function(evt){
-      this.hoverCallback(evt);
-      evt.cancelBubble = false;
-    }.bind(this)
+    this.hoverCallback.bind(this)
   );
 
   this.group.on('click tap',
-    function(evt){
-      var pos = this.stage.getPointerPosition();
-
-      this.hoverCallback(evt);
-      evt.cancelBubble = false;
-    }.bind(this)
+    this.hoverCallback.bind(this)
   );
 }
