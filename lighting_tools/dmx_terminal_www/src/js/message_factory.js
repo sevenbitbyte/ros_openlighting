@@ -30,12 +30,6 @@ ROSUtils.MessageFactory.prototype.getMessageTypes = function() {
   return list;
 };
 
-ROSUtils.MessageFactory.prototype.getMessageDetails = function(){
-  this.ros.getMessageDetails("lighting_msgs/DmxCommand",
-    this.getMessageDetailsCallback(this)
-  );
-};
-
 ROSUtils.MessageFactory.prototype.getMessageDetailsCallback = function(that){
   return function(details){
     //Create constructor functions
@@ -82,5 +76,11 @@ ROSUtils.MessageFactory.prototype.getMessageDetailsCallback = function(that){
           });
         })(details[idx]);
     };
-  };
+  }.bind(this);
+};
+
+ROSUtils.MessageFactory.prototype.getMessageDetails = function(){
+  this.ros.getMessageDetails("lighting_msgs/DmxCommand",
+    this.getMessageDetailsCallback(this)
+  );
 };

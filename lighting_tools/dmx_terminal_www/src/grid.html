@@ -1,0 +1,68 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <style>
+      body {
+        margin: 0px;
+        padding: 0px;
+      }
+    </style>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+
+    <script type="text/javascript" src="js/lib/jquery-2.1.1.js"></script>
+    <script type="text/javascript" src="js/lib/kinetic-v5.1.0.js"></script>
+    <script type="text/javascript" src="js/lib/eventemitter2.js"></script>
+    <script type="text/javascript" src="js/lib/tinycolor.js"></script>
+    <script type="text/javascript" src="js/lib/roslib.js"></script>
+    <script type="text/javascript" src="js/message_factory.js"></script>
+    <script type="text/javascript" src="js/ui.js"></script>
+    <script type="text/javascript" src="js/ui-grid.js"></script>
+    <script type="text/javascript" src="js/ui-inputbar.js"></script>
+    <script type="text/javascript" src="js/ui-stage.js"></script>
+  </head>
+
+
+  <body style="overflow: hidden" bgcolor='black'>
+    <center>
+      <div id="grid-0" class="stage"></div>
+    </center>
+
+    <script>
+      $( document ).ready(function() {
+        document.body.addEventListener('touchmove', function(event) {
+          event.preventDefault();
+        }, false);
+      });
+    </script>
+
+<script>
+
+$( document ).ready(function() {
+  var stages = $(".stage");
+
+  for(var i=0; i<stages.length; i++){
+    var options = {
+      container: stages[i],
+      width: $( window ).width(),
+      height: $( window ).height()
+    };
+
+    contain = options.container;
+    console.log(options.container);
+    var view = new Ui.StageView( options );
+
+    view.grid = new Ui.Grid(view.stage, {width: view.stage.width(), height:view.stage.height()});
+    view.stage.add(view.grid.layer);
+
+    $( window ).resize(function() {
+      view.stage.width( $( window ).width() );
+      view.stage.height( $( window ).height() );
+    });
+    //views.push(view);
+  }
+});
+</script>
+
+  </body>
+</html>

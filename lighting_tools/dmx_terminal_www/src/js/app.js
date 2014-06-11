@@ -175,7 +175,8 @@ function getEventData(canvas, evt) {
 
 var ros;
 var factory;
-var count=0;
+var count=1;
+var dir = 1;
 
 var serviceTest = function(){
   var dmxCmd = factory.createMessage('lighting_msgs/DmxCommand');
@@ -184,9 +185,20 @@ var serviceTest = function(){
 
   dmxValue.universe = 1;
   dmxValue.offset = 0;
-  for(i=0; i<255; i++){
-    dmxValue.data.push(i);
+  for(i=0; i<count; i++){
+    var val = (i/count) * 255;
+    dmxValue.data.push(val);
   }
+
+  count+=dir;
+
+  if(count == 256 && dir==1){
+    dir = -1;
+  }
+  else if(count == 0 && dir == -1){
+    dir = 1;
+  }
+
 
   frame.values.push(dmxValue);
   frame.durationMs = 1000;
@@ -219,6 +231,10 @@ var serviceTest = function(){
   );
 }
 
+var runTest = function(){
+  setInterval(serviceTest, 500);
+}
+
 $( document ).ready(function() {
 
   ros = new ROSLIB.Ros({
@@ -231,7 +247,7 @@ $( document ).ready(function() {
            factory = new ROSUtils.MessageFactory(ros);
            factory.getMessageDetails('lighting_msgs/DmxCommand');
 
-           //setInterval(serviceTest, 2000);
+
          });
 
   $('body').on('contextmenu', 'canvas#pan-tilt-view', function(e){ return false; });
@@ -242,6 +258,36 @@ $( document ).ready(function() {
   displayRadius = (canvas.width/2) * 0.75;
   pointerRadius = (255/2) * 0.06;
 
+  canvas.addEventListener("touchstart", function(evt){
+      var el = canvas;
+      var ctx = el.getContext("2d");
+      var touches = evt.changedTouches;
+      message = "touchstart: " + touches.length;
+  }, false);
+  canvas.addEventListener("touchend", function(evt){
+      var el = canvas;
+      var ctx = el.getContext("2d");
+      var touches = evt.changedTouches;
+      message = "touchend: " + touches.length;
+  }, false);
+  canvas.addEventListener("touchcancel", function(evt){
+      var el = canvas;
+      var ctx = el.getContext("2d");
+      var touches = evt.changedTouches;
+      message = "touchcancel: " + touches.length;
+  }, false);
+  canvas.addEventListener("touchleave", function(evt){
+      var el = canvas;
+      var ctx = el.getContext("2d");
+      var touches = evt.changedTouches;
+      message = "touchleave: " + touches.length;
+  }, false);
+  canvas.addEventListener("touchmove", function(evt){
+      var el = canvas;
+      var ctx = el.getContext("2d");
+      var touches = evt.changedTouches;
+      message = "touchmove: " + touches.length;
+  }, false);
 
   canvas.addEventListener('mousewheel', function(evt) {
     var data = getEventData(canvas, evt);
