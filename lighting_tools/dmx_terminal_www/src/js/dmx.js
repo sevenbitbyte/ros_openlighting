@@ -10,9 +10,16 @@ function() {
   if(Dmx.ros !== undefined){
     Dmx.ros.on('connection',
       function(){
-        console.log('connected');
+        console.log('Dmx.ros: connected');
         Dmx.factory = new ROSUtils.MessageFactory(Dmx.ros);
         Dmx.factory.getMessageDetails('lighting_msgs/DmxCommand');
+      }
+    );
+
+    Dmx.ros.on('error',
+      function(evt){
+        console.log("ERROR - Dmx.ros: ");
+        console.log(evt);
       }
     );
   }
@@ -25,6 +32,10 @@ Dmx.Address = function(options){
   if(options !== undefined && options != null){
     this.set(options);
   }
+}
+
+Dmx.Address.prototype.toString = function(){
+  return this.universe + '.' + this.offset;
 }
 
 Dmx.Address.prototype.set = function(options){
@@ -83,6 +94,14 @@ Dmx.Device = function(options){
 
 Dmx.Device.prototype.getField = function(name){
   return this.template.getField(name);
+}
+
+Dmx.Device.prototype.getFieldNames = function(){
+  var names=[];
+  for(var idx in this.template.fields){
+    names.push(idx);
+  }
+  return names;
 }
 
 Dmx.Device.prototype.setField = function(name, value){

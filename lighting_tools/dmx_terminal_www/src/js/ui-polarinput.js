@@ -118,9 +118,8 @@ Ui.PolarInput.prototype.getHoverValue = function(){
 Ui.PolarInput.prototype.inputEndCallback = function(evt){
   this._hover.enable = false;
   this.hoverOutsideCircle.hide();
-  this.render();
+  this.update();
 
-  console.log("Input end");
 }
 
 Ui.PolarInput.prototype.hoverCallback = function(evt){
@@ -143,6 +142,10 @@ Ui.PolarInput.prototype.hoverCallback = function(evt){
 Ui.PolarInput.prototype.setupEventHandlers = function(){
   this.group.on('mousemove touchmove',
     this.hoverCallback.bind(this)
+  );
+
+  this.group.on('mouseleave touchend',
+    this.inputEndCallback.bind(this)
   );
 
   this.group.on('click tap',

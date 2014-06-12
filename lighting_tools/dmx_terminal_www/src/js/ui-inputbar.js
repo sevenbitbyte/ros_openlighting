@@ -94,7 +94,7 @@ Ui.BarInput = function(stage, options){
       pos.y -= (this.group.getLayer().y() + this.group.y());
 
       this.setPos(pos);
-      Ui.emitter.emit('edit.'+this.globalName, this.value);
+      Ui.emitter.emit('change.'+this.globalName, this.value);
       evt.cancelBubble = true;
     }.bind(this)
   );

@@ -92,7 +92,7 @@ $( document ).ready(function() {
     options.name = 'dmx-1';
     options.width = view.stage.width();
     options.height = view.stage.height();
-    options.tileSize = { x: 10, y :10 }
+    options.tileSize = { x: 4, y :4 }
     options.tileCount = { x: 16, y: 32 };
     options.defaultTileOpt = {
       fill: 'grey',
@@ -109,6 +109,8 @@ $( document ).ready(function() {
     //options.x = 0;
     options.x += view.grid1.layer.width() + 1;
     options.defaultTileOpt.fill = 'green';
+    options.tileSize.x = 9;
+    options.tileSize.y = 9;
 
     view.grid2 = new Ui.TileGrid(view.stage, JSON.parse(JSON.stringify(options))
       /*{
@@ -126,8 +128,8 @@ $( document ).ready(function() {
     options.x += view.grid2.group.width() + 1;
     options.tileCount.x = 32;
     options.tileCount.y = 16;
-    options.tileSize.x = 10;
-    options.tileSize.y = 10;
+    options.tileSize.x = 19;
+    options.tileSize.y = 19;
     options.defaultTileOpt.fill = '#B2E9E2';
 
     view.grid3 = new Ui.TileGrid(view.stage, JSON.parse(JSON.stringify(options)));

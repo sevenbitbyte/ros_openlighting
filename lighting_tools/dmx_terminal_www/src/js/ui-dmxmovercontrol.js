@@ -29,12 +29,34 @@ Ui.DmxMoverControl = function(stage, options){
     x: config.x,
     y: config.y,
     offsetX: options.offsetX,
-    text: 'mover-00',
+    text: this.name,
     fontSize: 20,
     fontFamily: 'monospace',
     fill: '#B2E9E2'
   });
   this.layer.add(this.titleText);
+
+  this.addrText = new Kinetic.Text({
+    x: config.x,
+    y: config.y+21,
+    offsetX: options.offsetX,
+    text: 'dmx: ' + this.device.address.toString(),
+    fontSize: 8,
+    fontFamily: 'monospace',
+    fill: '#B2E9E2'
+  });
+  this.layer.add(this.addrText);
+
+  this.fieldsText = new Kinetic.Text({
+    x: config.x,
+    y: config.y+30,
+    offsetX: options.offsetX,
+    text: 'fields: ' + this.device.getFieldNames().length,
+    fontSize: 8,
+    fontFamily: 'monospace',
+    fill: '#B2E9E2'
+  });
+  this.layer.add(this.fieldsText);
 
   config.y += 20 + this.margins.inner.y*0.75;
 
@@ -108,12 +130,12 @@ Ui.DmxMoverControl.prototype.setupEventHandlers = function(){
   var device = this.device;
   Ui.emitter.on( barPath + '*',
     function(value){
-      console.log(this.event);
-      console.log(value);
+      //console.log(this.event);
+      //console.log(value);
       var fieldName = this.event.replace(barPath, '');
       field = device.getField(fieldName);
 
-      console.log('setting field: ' + device.name + '.' + fieldName);
+      //console.log('setting field: ' + device.name + '.' + fieldName);
 
       device.setField(field.name, ((field.max - field.min) * value) + field.min);
     }
@@ -126,7 +148,7 @@ Ui.DmxMoverControl.prototype.setupEventHandlers = function(){
     function(field){
 
       that.modelChangeHandler.bind(that)(field);
-      console.log(field);
+      //console.log(field);
     }
   );
 }

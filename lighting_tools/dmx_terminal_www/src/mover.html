@@ -64,12 +64,12 @@ $( document ).ready(function() {
       console.log(value);
     });*/
 
-  Dmx.emitter.on('change.Device.*', function(value){
-    console.log(this.event);
-    console.log(value);
-  });
+    /*Dmx.emitter.on('change.Device.*', function(value){
+      console.log(this.event);
+      console.log(value);
+    });*/
 
-    dev = new Dmx.Device({name:'mover-01'});
+    dev = new Dmx.Device({name:'mover-01', address: '1.453'});
 
     f1 = new Dmx.Field();
     f1.name = 'zoom';
