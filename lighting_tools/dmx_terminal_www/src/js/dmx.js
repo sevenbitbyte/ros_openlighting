@@ -1,6 +1,22 @@
 var Dmx={
-  emitter: new EventEmitter2({wildcard: true})
+  emitter: new EventEmitter2({wildcard: true}),
+  ros: new ROSLIB.Ros({
+    url : 'ws://' + window.location.host + ':4000'
+  })
 };
+
+$( document ).ready(
+function() {
+  if(Dmx.ros !== undefined){
+    Dmx.ros.on('connection',
+      function(){
+        console.log('connected');
+        Dmx.factory = new ROSUtils.MessageFactory(Dmx.ros);
+        Dmx.factory.getMessageDetails('lighting_msgs/DmxCommand');
+      }
+    );
+  }
+});
 
 Dmx.Address = function(options){
   this.universe = 0;

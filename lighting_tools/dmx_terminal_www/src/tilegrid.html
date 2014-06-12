@@ -1,0 +1,167 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <style>
+      body {
+        margin: 0px;
+        padding: 0px;
+      }
+    </style>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+
+    <script type="text/javascript" src="js/lib/jquery-2.1.1.js"></script>
+    <script type="text/javascript" src="js/lib/kinetic-v5.1.0.js"></script>
+    <script type="text/javascript" src="js/lib/eventemitter2.js"></script>
+    <script type="text/javascript" src="js/lib/tinycolor.js"></script>
+    <script type="text/javascript" src="js/lib/roslib.js"></script>
+    <script type="text/javascript" src="js/message_factory.js"></script>
+    <script type="text/javascript" src="js/dmx.js"></script>
+    <script type="text/javascript" src="js/ui.js"></script>
+    <script type="text/javascript" src="js/ui-tilegrid.js"></script>
+    <script type="text/javascript" src="js/ui-stage.js"></script>
+  </head>
+
+
+  <body style="overflow: hidden" bgcolor='black'>
+    <center>
+      <div id="tilegrid-0" class="stage"></div>
+    </center>
+
+    <script>
+      $( document ).ready(function() {
+        document.body.addEventListener('touchmove', function(event) {
+          event.preventDefault();
+        }, false);
+      });
+    </script>
+
+<script>
+var dev;
+var f1;
+var f2;
+var f3;
+var view;
+
+$( document ).ready(function() {
+
+  Dmx.emitter.on('change.Device.*', function(value){
+    console.log(this.event);
+    console.log(value);
+  });
+
+  dev = new Dmx.Device({name:'mover-01'});
+
+  f1 = new Dmx.Field();
+  f1.name = 'zoom';
+
+  f2 = new Dmx.Field();
+  f2.name = 'intensity';
+
+  f3 = new Dmx.Field();
+  f3.name = 'white';
+
+  dev.template.addField(f1);
+  dev.template.addField(f2);
+  dev.template.addField(f3);
+
+  dev.setField('zoom', 0.5);
+
+  var stages = $(".stage");
+
+  for(var i=0; i<stages.length; i++){
+    var options = {
+      container: stages[i],
+      width: $( window ).width(),
+      height: $( window ).height(),
+      x: 0,
+      y: 0,
+      offsetX: 0,
+      offsetY: 0,
+      scaleX: 1,
+      scaleY: 1
+    };
+
+    contain = options.container;
+    console.log(options.container);
+    view = new Ui.StageView( options );
+
+    options.container=undefined;
+    options.x=10;
+    options.y=10;
+    options.name = 'dmx-1';
+    options.width = view.stage.width();
+    options.height = view.stage.height();
+    options.tileSize = { x: 10, y :10 }
+    options.tileCount = { x: 16, y: 32 };
+    options.defaultTileOpt = {
+      fill: 'grey',
+      offsetX: 0,
+      //stroke: 'yellow',
+      strokeWidth: 2,
+      dash: [1,1]
+    };
+
+    view.grid1 = new Ui.TileGrid(view.stage, JSON.parse(JSON.stringify(options)));
+
+
+
+    //options.x = 0;
+    options.x += view.grid1.layer.width() + 1;
+    options.defaultTileOpt.fill = 'green';
+
+    view.grid2 = new Ui.TileGrid(view.stage, JSON.parse(JSON.stringify(options))
+      /*{
+      x: 20,
+      y: 0,
+      tileCount: {x: 32, y: 16},
+      defaultTileOpt: {fill : 'green'},
+      tileSize: { x: 5, y :5 }
+    }*/);
+
+
+
+    console.log("grid1 width = " + view.grid1.group.width());
+
+    options.x += view.grid2.group.width() + 1;
+    options.tileCount.x = 32;
+    options.tileCount.y = 16;
+    options.tileSize.x = 10;
+    options.tileSize.y = 10;
+    options.defaultTileOpt.fill = '#B2E9E2';
+
+    view.grid3 = new Ui.TileGrid(view.stage, JSON.parse(JSON.stringify(options)));
+
+
+    options.y += view.grid3.group.height() + 1;
+    options.tileCount.x = 25;
+    options.tileCount.y = 25;
+    options.tileSize.x = 2;
+    options.tileSize.y = 2;
+    options.defaultTileOpt.fill = 'orange';
+    options.margins = {
+      inner: {x: 0, y:0}
+    }
+
+    view.grid4 = new Ui.TileGrid(view.stage, JSON.parse(JSON.stringify(options)));
+    /*view.grid3.getTile(10,10).setAttr('stroke', 'red');
+    view.grid3.getTile(11,10).setAttr('stroke', 'red');
+    view.grid3.getTile(12,10).setAttr('stroke', 'red');
+    view.grid3.getTile(13,10).setAttr('stroke', 'red');*/
+
+    view.stage.add(view.grid1.layer);
+    view.stage.add(view.grid2.layer);
+    view.stage.add(view.grid3.layer);
+    view.stage.add(view.grid4.layer);
+
+    $( window ).resize(function() {
+      view.stage.width( $( window ).width() );
+      view.stage.height( $( window ).height() );
+    });
+    //views.push(view);
+  }
+});
+</script>
+
+  </body>
+</html>
