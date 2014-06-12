@@ -2,6 +2,9 @@
 
 Ui.DmxMoverControl = function(stage, options){
   this.stage = stage;
+  this.device = options.device;
+  this.name = options.name;
+  this.globalName = "DmxMoverControl." + this.name;
   this.margins = { inner: {x: 0, y: 10}, outer: {x: 10, y: 10} };
 
 
@@ -40,23 +43,27 @@ Ui.DmxMoverControl = function(stage, options){
 
   config.width = this.layer.width() - (2 * this.margins.outer.x);
   config.height = Math.min(polarSize, config.width);
+  config.name = this.name + '.pan-tilt';
   this.polarInput = new Ui.PolarInput(this.stage, config);
   this.addGroup(this.polarInput.group);
 
   // Zoom
   config.y += config.height + this.margins.inner.y;
   config.height = Math.floor((barSize / 3) / 5.0)*5;
-  this.zoomBar = new Ui.InputBar(this.stage, config);
+  config.name = this.name + '.zoom';
+  this.zoomBar = new Ui.BarInput(this.stage, config);
   this.addGroup(this.zoomBar.group);
 
   // Intensity
   config.y += config.height + this.margins.inner.y;
-  this.intensityBar = new Ui.InputBar(this.stage, config);
+  config.name = this.name + '.intensity';
+  this.intensityBar = new Ui.BarInput(this.stage, config);
   this.addGroup(this.intensityBar.group);
 
-  // Intensity
+  // White
   config.y += config.height + this.margins.inner.y;
-  this.whiteBar = new Ui.InputBar(this.stage, config);
+  config.name = this.name + '.white';
+  this.whiteBar = new Ui.BarInput(this.stage, config);
 
   //this.whiteBar.interiorRect.setAttrs( {'fill': 'red' } );
   //this.polarInput.hoverOutsideCircle.setAttrs( {'stroke': 'red' } );
@@ -83,6 +90,43 @@ Ui.DmxMoverControl.prototype.addGroup = function(g){
   );
 }
 
+Ui.DmxMoverControl.prototype.modelChangeHandler = function(field){
+  var scaledValue = (field.value - field.min) / (field.max - field.min);
+  if(field.name == 'zoom'){
+    this.zoomBar.setValue(scaledValue);
+  }
+  else if(field.name == 'intensity'){
+    this.intensityBar.setValue(scaledValue);
+  }
+  else if(field.name == 'white'){
+    this.whiteBar.setValue(scaledValue);
+  }
+}
+
 Ui.DmxMoverControl.prototype.setupEventHandlers = function(){
-  //
+  var barPath = 'change.BarInput.'+this.name + '.';
+  var device = this.device;
+  Ui.emitter.on( barPath + '*',
+    function(value){
+      console.log(this.event);
+      console.log(value);
+      var fieldName = this.event.replace(barPath, '');
+      field = device.getField(fieldName);
+
+      console.log('setting field: ' + device.name + '.' + fieldName);
+
+      device.setField(field.name, ((field.max - field.min) * value) + field.min);
+    }
+  );
+
+  //Handle model changes
+  var that = this;
+  var devPath = 'change.Device.'+device.name;
+  Dmx.emitter.on(devPath,
+    function(field){
+
+      that.modelChangeHandler.bind(that)(field);
+      console.log(field);
+    }
+  );
 }

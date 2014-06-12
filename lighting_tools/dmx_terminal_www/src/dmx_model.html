@@ -49,15 +49,19 @@ $( document ).ready(function() {
   dev = new Dmx.Device({name:'mover-01'});
 
   f1 = new Dmx.Field();
-  f1.name = 'field1';
+  f1.name = 'zoom';
 
   f2 = new Dmx.Field();
-  f2.name = 'field2';
+  f2.name = 'intensity';
+
+  f3 = new Dmx.Field();
+  f3.name = 'white';
 
   dev.template.addField(f1);
   dev.template.addField(f2);
+  dev.template.addField(f3);
 
-  dev.setField('field1', 0.5);
+  dev.setField('zoom', 0.5);
 });
 </script>
 

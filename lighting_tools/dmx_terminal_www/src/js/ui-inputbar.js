@@ -1,7 +1,9 @@
 //var Ui = {};
 
-Ui.InputBar = function(stage, options){
+Ui.BarInput = function(stage, options){
   this.stage = stage;
+  this.name = options.name;
+  this.globalName = "BarInput." + this.name;
   this.margins = { inner: {x: 2, y: 2}, outer: {x: 0, y: 0} };
   this.value = 1.0;
 
@@ -10,7 +12,7 @@ Ui.InputBar = function(stage, options){
 
   this.group = new Kinetic.Group(options);
 
-  console.log("InputBar() - " + JSON.stringify(options));
+  console.log("BarInput() - " + JSON.stringify(options));
   //console.log(this.group);
 
   //Exterior
@@ -49,6 +51,7 @@ Ui.InputBar = function(stage, options){
       pos.y -= (this.group.getLayer().y() + this.group.y());
 
       this.setPos(pos);
+      Ui.emitter.emit('change.'+this.globalName, this.value);
       evt.cancelBubble = true;
     }.bind(this)
   );
@@ -60,6 +63,7 @@ Ui.InputBar = function(stage, options){
       pos.y -= (this.group.getLayer().y() + this.group.y());
 
       this.setPos(pos);
+      Ui.emitter.emit('change.'+this.globalName, this.value);
       evt.cancelBubble = true;
     }.bind(this)
   );
@@ -72,6 +76,7 @@ Ui.InputBar = function(stage, options){
         pos.y -= (this.group.getLayer().y() + this.group.y());
 
         this.setPos(pos);
+        Ui.emitter.emit('change.'+this.globalName, this.value);
         evt.cancelBubble = true;
       }
 
@@ -89,6 +94,7 @@ Ui.InputBar = function(stage, options){
       pos.y -= (this.group.getLayer().y() + this.group.y());
 
       this.setPos(pos);
+      Ui.emitter.emit('edit.'+this.globalName, this.value);
       evt.cancelBubble = true;
     }.bind(this)
   );
@@ -110,7 +116,7 @@ this._wireframe = new Kinetic.Rect({
   return this;
 }
 
-Ui.InputBar.prototype.update = function(){
+Ui.BarInput.prototype.update = function(){
   this.exteriorRect.x(this.margins.outer.x);
   this.exteriorRect.y(this.margins.outer.y);
   this.exteriorRect.width(this.group.width() - (2*this.margins.outer.x));
@@ -126,12 +132,11 @@ Ui.InputBar.prototype.update = function(){
   this.group.fire('draw');
 }
 
-Ui.InputBar.prototype.setPos = function(pos){
+Ui.BarInput.prototype.setPos = function(pos){
   this.setValue( pos.x / this.group.width() );
 }
 
-Ui.InputBar.prototype.setValue = function(value){
+Ui.BarInput.prototype.setValue = function(value){
   this.value = Math.max(0.0, Math.min(1.0, value));
   this.update();
-  this.group.fire('valuechanged', null, false);
 }

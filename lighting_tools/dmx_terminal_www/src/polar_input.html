@@ -57,7 +57,7 @@ $( document ).ready(function() {
     var view = new Ui.StageView( options );
 
 
-    view.element = new Ui.PolarInput(view.stage, {width: view.stage.width(), height:view.stage.height()});
+    view.element = new Ui.PolarInput(view.stage, {name: 'polar1', width: view.stage.width(), height:view.stage.height()});
 
     view.stage.add(view.element.layer);
 

@@ -1,4 +1,6 @@
-var Ui = {};
+var Ui = {
+  emitter: new EventEmitter2({wildcard: true})
+};
 
 Ui.Utils = {
 

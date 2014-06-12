@@ -33,10 +33,11 @@ Dmx.Address.prototype.set = function(options){
 Dmx.Field = function(options){
   this.offset = 0;
   this.length = 1;
+  this.bytes = 1;
   this.name = '';
   this.min = 0;
   this.default = 0;
-  this.max = Math.pow(2, 8*this.length)-1;
+  this.max = Math.pow(2, 8*this.bytes)-1;
   this.value = this.default;
 }
 

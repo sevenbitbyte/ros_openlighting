@@ -16,6 +16,7 @@
     <script type="text/javascript" src="js/lib/tinycolor.js"></script>
     <script type="text/javascript" src="js/lib/roslib.js"></script>
     <script type="text/javascript" src="js/message_factory.js"></script>
+    <script type="text/javascript" src="js/dmx.js"></script>
     <script type="text/javascript" src="js/ui.js"></script>
     <script type="text/javascript" src="js/ui-grid.js"></script>
     <script type="text/javascript" src="js/ui-inputbar.js"></script>
@@ -58,9 +59,35 @@ $( document ).ready(function() {
     console.log(options.container);
     var view = new Ui.StageView( options );
 
+    /*Dmx.emitter.on('change.Device.mover-01*', function(value){
+      console.log(this.event);
+      console.log(value);
+    });*/
 
-    view.element1 = new Ui.DmxMoverControl(view.stage, {x:0, width: 200, height:300});
-    view.element2 = new Ui.DmxMoverControl(view.stage, {x: 200, width: 200, height:300});
+  Dmx.emitter.on('change.Device.*', function(value){
+    console.log(this.event);
+    console.log(value);
+  });
+
+    dev = new Dmx.Device({name:'mover-01'});
+
+    f1 = new Dmx.Field();
+    f1.name = 'zoom';
+
+    f2 = new Dmx.Field();
+    f2.name = 'intensity';
+
+    f3 = new Dmx.Field();
+    f3.name = 'white';
+
+    dev.template.addField(f1);
+    dev.template.addField(f2);
+    dev.template.addField(f3);
+
+    //dev.setField('field1', 0.5);
+
+    view.element1 = new Ui.DmxMoverControl(view.stage, {name: 'mover-1', device: dev, x:0, width: 200, height:300});
+    view.element2 = new Ui.DmxMoverControl(view.stage, {name: 'mover-2', device: dev, x: 200, width: 200, height:300});
 
     view.stage.add(view.element1.layer);
     view.stage.add(view.element2.layer);
