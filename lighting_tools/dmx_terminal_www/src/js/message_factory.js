@@ -30,18 +30,18 @@ ROSUtils.MessageFactory.prototype.getMessageTypes = function() {
   return list;
 };
 
-ROSUtils.MessageFactory.prototype.getMessageDetailsCallback = function(that){
+ROSUtils.MessageFactory.prototype.getMessageDetailsCallback = function(that, type, cb){
   return function(details){
-    //Create constructor functions
     console.log(details);
     for(var idx in details){
+      //Create constructor function
       (function(detail){
-      var fieldList=details[idx].fieldnames;
-      var typeList=details[idx].fieldtypes;
-      var exampleList=details[idx].examples;
+        var fieldList=details[idx].fieldnames;
+        var typeList=details[idx].fieldtypes;
+        var exampleList=details[idx].examples;
 
-      console.log("Creating constructor[" + idx + "]: " + details[idx].type);
-      var currentType = details[idx].type;
+        console.log("Creating constructor[" + idx + "]: " + details[idx].type);
+        var currentType = details[idx].type;
 
         that.addMessageConstructor(currentType,
           function(){
@@ -73,14 +73,21 @@ ROSUtils.MessageFactory.prototype.getMessageDetailsCallback = function(that){
                 this[fieldName] = undefined;
               }
             }
-          });
-        })(details[idx]);
-    };
+          }
+        );
+
+      }
+    )(details[idx]);
+    }
+
+    if(cb !== undefined){
+      cb(type);
+    }
   }.bind(this);
 };
 
-ROSUtils.MessageFactory.prototype.getMessageDetails = function(){
-  this.ros.getMessageDetails("lighting_msgs/DmxCommand",
-    this.getMessageDetailsCallback(this)
+ROSUtils.MessageFactory.prototype.getMessageDetails = function(type, cb){
+  this.ros.getMessageDetails(type,
+    this.getMessageDetailsCallback(this, type, cb)
   );
 };

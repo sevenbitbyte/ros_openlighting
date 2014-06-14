@@ -139,8 +139,8 @@ Ui.TileGrid.prototype.getTile = function(x,y){
 
   var hsvColor = tinycolor(options.fill).toHsv();
 
-  hsvColor.v = Math.random();
-  hsvColor.s = Math.random();
+  hsvColor.s = Math.random() * 100;
+  hsvColor.v = Math.random() * 100;
 
   options.fill = tinycolor(hsvColor).toHexString();
 

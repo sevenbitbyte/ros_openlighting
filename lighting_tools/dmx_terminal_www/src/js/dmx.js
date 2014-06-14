@@ -12,7 +12,12 @@ function() {
       function(){
         console.log('Dmx.ros: connected');
         Dmx.factory = new ROSUtils.MessageFactory(Dmx.ros);
-        Dmx.factory.getMessageDetails('lighting_msgs/DmxCommand');
+        Dmx.factory.getMessageDetails('lighting_msgs/DmxCommand',
+          function(type){
+            console.log("type: " + type + " ready");
+            Dmx.emitter.emit('ready');
+          }
+        );
       }
     );
 
@@ -65,7 +70,39 @@ Dmx.Field = function(options){
   this.min = 0;
   this.default = 0;
   this.max = Math.pow(2, 8*this.bytes)-1;
-  this.value = this.default;
+}
+
+Dmx.Field.prototype.setBytes = function(count){
+  this.bytes = count;
+  this.max = Math.pow(2, 8*this.bytes)-1;
+}
+
+Dmx.Field.prototype.computeValue = function(value){
+  if(value > 0.0 && value <= 1.0) {
+    value = Math.round(value * f.max);
+  }
+  else{
+    value = Math.round(value);
+  }
+
+  if(value < f.min){
+    throw "value too low";
+  }
+
+  if(value > f.max){
+    throw "value too low";
+  }
+
+  console.log(value);
+
+  var arr=new Array(this.bytes);
+  for(var i=0; i<this.bytes; i++){
+    arr[this.bytes - (1+i)] = (value >> i*8) & 255;
+    //console.log(byte);
+    //arr.push(byte);
+  }
+
+  return arr;
 }
 
 Dmx.DeviceTemplate = function(options){
@@ -75,7 +112,8 @@ Dmx.DeviceTemplate = function(options){
 
 Dmx.DeviceTemplate.prototype.getField = function(name){
   if(this.fields[name] === undefined){
-    throw "No such field [" + name + "]";
+    //throw "No such field [" + name + "]";
+    return undefined;
   }
 
   return this.fields[name];
@@ -90,6 +128,7 @@ Dmx.Device = function(options){
   this.name = options.name;
   this.address = new Dmx.Address(options.address);
   this.template = new Dmx.DeviceTemplate(options.type);
+  this.values = {};  //Mapped by template.fields.name
 }
 
 Dmx.Device.prototype.getField = function(name){
@@ -104,16 +143,136 @@ Dmx.Device.prototype.getFieldNames = function(){
   return names;
 }
 
-Dmx.Device.prototype.setField = function(name, value){
+Dmx.Device.prototype.update = function(){
+  Dmx.emitter.emit('update.Device.'+this.name, this);
+}
+
+Dmx.Device.prototype.set = function(name, value){
   console.log("Dmx.Device.setField() - " + name + ',' + value)
   f = this.getField(name);
+  this.values[f.name] = f.computeValue(value);
 
-  if(value > 0.0 && value <= 1.0) {
-    f.value = (value * f.max);
+  Dmx.emitter.emit('change.Device.'+this.name, {device:this, field:f});
+}
+
+
+Dmx.CommandClient = function(servicePath){
+  if(servicePath === undefined){
+    servicePath = '/ola_bridge/run_cmd';
   }
-  else{
-    f.value = value;
+  this.srvClient = new ROSLIB.Service({
+    ros : Dmx.ros,
+    name : servicePath,
+    serviceType : 'lighting_msgs/run_command'
+  });
+
+  this.command = {};
+
+  this.mode = 'replace';
+}
+
+Dmx.CommandClient.prototype.add = function(dev){
+  console.log("CommandClient - add device " + dev.name);
+  /*Dmx.emitter.on('change.Device.'+dev.name,
+    function(evt){
+      this.set(evt.device, evt.field);
+    }.bind(this)
+  );*/
+
+  Dmx.emitter.on('update.Device.'+dev.name,
+    function(dev){
+      this.setDevice(dev);
+      this.send();
+    }.bind(this)
+  );
+}
+
+Dmx.CommandClient.prototype.setDevice = function(dev){
+  console.log("Dmx.CommandClient.setDevice");
+  this.command = Dmx.factory.createMessage('lighting_msgs/DmxCommand');
+
+  var frame = Dmx.factory.createMessage('lighting_msgs/DmxFrame');
+
+  var fieldNames = dev.values;
+  for(idx in fieldNames){
+    var dmxValue = Dmx.factory.createMessage('lighting_msgs/DmxValue');
+    var field = dev.getField(idx);
+
+    if(field === undefined){
+      console.log("not found: " + idx)
+      continue;
+    }
+
+    dmxValue.universe = dev.address.universe;
+    dmxValue.offset = dev.address.offset + field.offset;
+
+    var val = dev.values[field.name];
+
+    if(val.length != field.bytes){
+      console.log(dev)
+      console.log(field)
+      throw "DMX data format error (expected " + field.bytes + "bytes but recieved " + val.length + ")";
+    }
+
+    for(i=0; i<field.length; i++){
+      dmxValue.data.push(val[i]);
+    }
+
+    frame.values.push(dmxValue);
   }
 
-  Dmx.emitter.emit('change.Device.'+this.name, f);
+  frame.durationMs = 1000;
+
+  this.command.layers = [frame];
+}
+
+Dmx.CommandClient.prototype.set = function(dev, field){
+  console.log("Dmx.CommandClient.set");
+  if(this.mode == 'replace'){
+    this.command = Dmx.factory.createMessage('lighting_msgs/DmxCommand');
+
+    var frame = Dmx.factory.createMessage('lighting_msgs/DmxFrame');
+    var dmxValue = Dmx.factory.createMessage('lighting_msgs/DmxValue');
+
+    console.log(dev);
+
+    dmxValue.universe = dev.address.universe;
+    dmxValue.offset = dev.address.offset + field.offset;
+
+    var val = dev.values[field.name];
+
+    if(val.length != field.bytes){
+      console.log(dev)
+      console.log(field)
+      throw "DMX data format error (expected " + field.bytes + "bytes but recieved " + val.length + ")";
+    }
+
+    for(i=0; i<field.length; i++){
+      dmxValue.data.push(val[i]);
+    }
+
+    frame.values.push(dmxValue);
+    frame.durationMs = 1000;
+
+    this.command.layers = [frame];
+  }
+}
+
+Dmx.CommandClient.prototype.send = function(){
+  var request = new ROSLIB.ServiceRequest({
+    command : this.command
+  });
+
+  console.log("Dmx.CommandClient.send()");
+  console.log(this.command);
+
+  this.srvClient.callService(request,
+    function(result) {
+      console.log('Dmx.CommandClient: Result for service call on: ' + result.status);
+      console.log(result);
+    },
+    function(err){
+      console.log("ERROR - Dmx.CommandClient: " + err);
+    }
+  );
 }

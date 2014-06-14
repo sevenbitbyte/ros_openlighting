@@ -6,11 +6,15 @@ Ui.DmxMoverControl = function(stage, options){
   this.name = options.name;
   this.globalName = "DmxMoverControl." + this.name;
   this.margins = { inner: {x: 0, y: 10}, outer: {x: 10, y: 10} };
+  if(options.margins !== undefined){
+    if(options.margins.inner !== undefined){
+      this.margins.inner = options.margins.inner;
+    }
 
-
-
-  if(options.margins !== undefined){ margins=options.margins }
-  if(options.value !== undefined){ this.value=options.value }
+    if(options.margins.outer !== undefined){
+      this.margins.outer = options.margins.outer;
+    }
+  }
 
   this.layer = new Kinetic.Layer(options);
 
@@ -58,7 +62,7 @@ Ui.DmxMoverControl = function(stage, options){
   });
   this.layer.add(this.fieldsText);
 
-  config.y += 20 + this.margins.inner.y*0.75;
+  config.y += 30;
 
   var barSize = (this.layer.height() - (2 * this.margins.outer.y))/4;
   var polarSize = ((barSize * 3) - (2 * this.margins.outer.y));
@@ -137,7 +141,20 @@ Ui.DmxMoverControl.prototype.setupEventHandlers = function(){
 
       //console.log('setting field: ' + device.name + '.' + fieldName);
 
-      device.setField(field.name, ((field.max - field.min) * value) + field.min);
+      device.set(field.name, value);
+      device.update();
+    }
+  );
+
+  var polarPath = 'change.PolarInput.'+this.name+'.pan-tilt';
+  Ui.emitter.on( polarPath,
+    function(value){
+      console.log('polar input changed');
+      console.log(value);
+
+      device.set('pan', value.theta);
+      device.set('tilt', value.r);
+      device.update();
     }
   );
 

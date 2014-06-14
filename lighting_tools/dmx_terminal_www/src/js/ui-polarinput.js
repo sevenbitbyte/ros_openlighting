@@ -96,10 +96,18 @@ Ui.PolarInput.prototype.update = function(){
 }
 
 Ui.PolarInput.prototype.getPosValue = function(x, y){
-  return {
-    r: Math.sqrt( Math.pow(this.center.x - x, 2) + Math.pow(this.center.y -y, 2) ),
-    theta: Math.atan2(y - this.center.y, x - this.center.x) * (180.0/Math.PI)
+  var val = {
+    r: Math.sqrt( Math.pow(this.center.x - x, 2) + Math.pow(this.center.y -y, 2) ) / this.radius,
+    theta: -Math.atan2(y - this.center.y, x - this.center.x)
   };
+
+  if(val.theta < 0){
+    val.theta += 2*Math.PI;
+  }
+
+  val.theta = val.theta / (2 * Math.PI)
+
+  return val;
 }
 
 Ui.PolarInput.prototype.setHoverXY = function(x, y){
@@ -108,7 +116,7 @@ Ui.PolarInput.prototype.setHoverXY = function(x, y){
   this._hover.enable = true;
   this.hoverOutsideCircle.show();
   this.update();
-  Ui.emitter.emit('change.'+this.globalName+'.hover', this.getHoverValue());
+  Ui.emitter.emit('change.PolarInput.'+this.globalName+'.hover', this.getHoverValue());
 }
 
 Ui.PolarInput.prototype.getHoverValue = function(){
@@ -123,32 +131,42 @@ Ui.PolarInput.prototype.inputEndCallback = function(evt){
 }
 
 Ui.PolarInput.prototype.hoverCallback = function(evt){
-
   var pos = this.stage.getPointerPosition();
   pos.x -= (this.group.getLayer().x() + this.group.x());
   pos.y -= (this.group.getLayer().y() + this.group.y());
 
-  //var angle = Math.atan2(pos.y - this.center.y, pos.x - this.center.x) * (180.0/Math.PI);
-  //console.log("Hover: " + pos.x + ", " + pos.y + " angle=" + angle);
 
   this.setHoverXY(pos.x, pos.y);
-  var angle = this.getHoverValue().theta;
+  var angle = 360 - (this.getHoverValue().theta * 360);
   this.hoverAngleKnuckle.setAttr("rotationDeg", angle - (this.hoverAngleKnuckle.angle()/2));
 
   evt.cancelBubble = false;
 };
 
+Ui.PolarInput.prototype.clickCallback = function(evt){
+  var pos = this.stage.getPointerPosition();
+  pos.x -= (this.group.getLayer().x() + this.group.x());
+  pos.y -= (this.group.getLayer().y() + this.group.y());
+
+  this.setHoverXY(pos.x, pos.y);
+  var angle = 360 - (this.getHoverValue().theta * 360);
+  this.hoverAngleKnuckle.setAttr("rotationDeg", angle - (this.hoverAngleKnuckle.angle()/2));
+
+  Ui.emitter.emit('change.'+this.globalName, this.getPosValue(pos.x, pos.y));
+  evt.cancelBubble = false;
+};
+
 
 Ui.PolarInput.prototype.setupEventHandlers = function(){
-  this.group.on('mousemove touchmove',
+  this.group.on('mousemove',
     this.hoverCallback.bind(this)
   );
 
-  this.group.on('mouseleave touchend',
+  /*this.group.on('mouseleave',
     this.inputEndCallback.bind(this)
-  );
+  );*/
 
-  this.group.on('click tap',
-    this.hoverCallback.bind(this)
+  this.group.on('click touchstart touchmove',
+    this.clickCallback.bind(this)
   );
 }
