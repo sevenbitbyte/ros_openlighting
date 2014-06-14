@@ -116,7 +116,7 @@ Ui.PolarInput.prototype.setHoverXY = function(x, y){
   this._hover.enable = true;
   this.hoverOutsideCircle.show();
   this.update();
-  Ui.emitter.emit('change.PolarInput.'+this.globalName+'.hover', this.getHoverValue());
+  Ui.emitter.emit('change.'+this.globalName+'.hover', this.getHoverValue());
 }
 
 Ui.PolarInput.prototype.getHoverValue = function(){
