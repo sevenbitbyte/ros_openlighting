@@ -153,7 +153,7 @@ Ui.DmxMoverControl.prototype.setupEventHandlers = function(){
       console.log(value);
 
       device.set('pan', value.theta);
-      device.set('tilt', value.r);
+      device.set('tilt', (1-value.r) / 2);
       device.update();
     }
   );
