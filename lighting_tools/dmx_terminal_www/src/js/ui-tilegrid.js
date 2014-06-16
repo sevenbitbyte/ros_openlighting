@@ -19,6 +19,16 @@ Ui.TileGrid = function(stage, opt){
   this.tiles = {};
   this.selections = {};       // x -> y -> id:Number
   this.selectionOpts = {};    // id -> {fill:..., stroke:...}
+  this.defaultSelection = 1;
+  if(opt.defaultTileOpt){
+    this.defaultTileOpt = opt.defaultTileOpt;
+  }
+  else{
+    this.defaultTileOpt = {fill: 'grey'};
+  }
+
+  this.selectionOpts[1] = {fill: 'blue', fillEnabled:true};
+
   this.tileSize = {
     x: opt.tileSize.x,
     y: opt.tileSize.y
@@ -40,8 +50,7 @@ Ui.TileGrid = function(stage, opt){
     enable: false
   }
 
-  this.defaultSelection = 0;
-  this.defaultTileOpt = opt.defaultTileOpt;
+
 
   opt.width = this.size.x;
   opt.height = this.size.y;
@@ -53,7 +62,7 @@ Ui.TileGrid = function(stage, opt){
 
   for(var i=0; i<this.tileCount.x; i++){
     for(var j=0; j<this.tileCount.y; j++){
-      this.getTile(i,j);
+      this.createTile(i,j);
     }
   }
 
@@ -82,6 +91,14 @@ Ui.TileGrid.prototype.update = function(){
   if(this._hover.enable){
     var pos = this.tilePosToLayer( this.layerPosToTile(this._hover));
     this.hoverOutsideRect.setAttrs(pos);
+  }
+
+  for(x in this.selections){
+    for(y in this.selections[x]){
+      //this.getTile(x,y).setAttrs( this.selectionOpts[this.getSelection()] );
+      this.getTile(x,y).draw();
+      //console.log('drew selection ' + x + ',' + y);
+    }
   }
 
   this.group.draw();
@@ -113,6 +130,27 @@ Ui.TileGrid.prototype.layerPosToTile = function(layerPos){
   }
 }
 
+Ui.TileGrid.prototype.createTile = function(x,y){
+  x = Math.round(x);
+  y = Math.round(y);
+
+  if( this.tiles[x] === undefined ){
+    this.tiles[x] = {};
+  }
+
+  var pos = this.tilePosToLayer({x:x, y:y});
+  this.tiles[x][y] = new Kinetic.Rect({
+    x: pos.x,
+    y: pos.y,
+    width: this.tileSize.x,
+    height: this.tileSize.y
+  });
+
+  this.tiles[x][y].setAttrs(this.defaultTileOpt);
+  this.group.add( this.tiles[x][y] );
+  return this.tiles[x][y];
+}
+
 Ui.TileGrid.prototype.getTile = function(x,y){
   x = Math.round(x);
   y = Math.round(y);
@@ -127,26 +165,7 @@ Ui.TileGrid.prototype.getTile = function(x,y){
     this.tiles[x] = {};
   }
 
-  var pos = this.tilePosToLayer({x:x, y:y});
-  this.tiles[x][y] = new Kinetic.Rect({
-    x: pos.x,
-    y: pos.y,
-    width: this.tileSize.x,
-    height: this.tileSize.y
-  });
-
-  var options = JSON.parse( JSON.stringify(this.defaultTileOpt) );
-
-  var hsvColor = tinycolor(options.fill).toHsv();
-
-  hsvColor.s = Math.random() * 100;
-  hsvColor.v = Math.random() * 100;
-
-  options.fill = tinycolor(hsvColor).toHexString();
-
-  this.tiles[x][y].setAttrs(options);
-  this.group.add( this.tiles[x][y] );
-  return this.tiles[x][y];
+  return undefined;
 }
 
 Ui.TileGrid.prototype.getSelection = function(x,y){
@@ -162,9 +181,41 @@ Ui.TileGrid.prototype.getSelection = function(x,y){
   else{
     this.selections[x] = {};
   }
+  return undefined;
+}
 
-  this.selections[x][y] = this._defaultSelection;
-  return this.selections[x][y];
+Ui.TileGrid.prototype.setSelection = function(x,y,val){
+  x = Math.floor(x);
+  y = Math.floor(y);
+
+  if( this.selections[x] !== undefined ){
+    if( this.selections[x][y] === undefined){
+      this.selections[x][y] = {};
+    }
+  }
+  else{
+    this.selections[x] = {};
+    this.selections[x][y] = {};
+  }
+
+
+  if(val !== undefined){
+    this.selections[x][y] = val;
+  }
+  else{
+    this.selections[x][y] = this.defaultSelection;
+  }
+  console.log(x+','+y+' selectoion=' + this.selections[x][y])
+  console.log(this.selectionOpts[this.selections[x][y]]);
+
+  this.getTile(x,y).setAttrs( this.selectionOpts[this.selections[x][y]] );
+}
+
+Ui.TileGrid.prototype.removeSelection = function(x,y){
+  if( this.selections[x][y] !== undefined ){
+    delete this.selections[x][y];
+    this.getTile(x,y).setAttrs( this.defaultTileOpt );
+  }
 }
 
 
@@ -188,6 +239,45 @@ Ui.TileGrid.prototype.inputEndCallback = function(evt){
   evt.cancelBubble = false;
 }
 
+Ui.TileGrid.prototype.selectCallback = function(evt){
+
+  console.log('selected callbacl');
+  var pos = this.stage.getPointerPosition();
+
+  if(pos === undefined){
+    return;
+  }
+
+  pos.x -= (this.group.getLayer().x() + this.group.x());
+  pos.y -= (this.group.getLayer().y() + this.group.y());
+
+  if(pos.x < 0 || pos.x > this.size.x-1){
+    evt.cancelBubble = false;
+    return;
+  }
+  else if(pos.y < 0 || pos.y > this.size.y-1){
+    evt.cancelBubble = false;
+    return;
+  }
+
+  pos = this.layerPosToTile(pos);
+
+  if( this.getSelection(pos.x, pos.y) === undefined){
+    this.setSelection(pos.x, pos.y);
+    console.log('selected ' + pos.x + ',' + pos.y);
+  }
+  else{
+    this.removeSelection(pos.x, pos.y);
+    console.log('removed selection ' + pos.x + ',' + pos.y);
+  }
+
+  
+
+  this.update();
+
+  Ui.emitter.emit('select.'+this.globalName+'.hover', pos);
+}
+
 Ui.TileGrid.prototype.hoverCallback = function(evt){
   var pos = this.stage.getPointerPosition();
   pos.x -= (this.group.getLayer().x() + this.group.x());
@@ -203,7 +293,7 @@ Ui.TileGrid.prototype.hoverCallback = function(evt){
   }
 
   this.setHoverXY(pos.x, pos.y);
-  //Ui.emitter.emit('change.'+this.globalName+'.hover', this.getHoverValue());
+  Ui.emitter.emit('change.'+this.globalName+'.hover', this.getHoverValue());
   evt.cancelBubble = false;
 };
 
@@ -214,5 +304,9 @@ Ui.TileGrid.prototype.setupEventHandlers = function(){
 
   this.group.on('mouseleave touchend',
     this.inputEndCallback.bind(this)
+  );
+
+  this.group.on('click tap',
+    this.selectCallback.bind(this)
   );
 }

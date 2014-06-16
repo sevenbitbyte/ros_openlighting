@@ -78,6 +78,10 @@ Dmx.Field.prototype.setBytes = function(count){
 }
 
 Dmx.Field.prototype.computeValue = function(value){
+  if(value.length !== undefined && value.length > 0){
+    return value;
+  }
+
   if(value > 0.0 && value <= 1.0) {
     value = Math.round(value * f.max);
   }
@@ -215,7 +219,9 @@ Dmx.CommandClient.prototype.setDevice = function(dev){
     }
 
     for(i=0; i<field.length; i++){
-      dmxValue.data.push(val[i]);
+      for(j=0; j<val.length; j++){
+        dmxValue.data.push(val[j]);
+      }
     }
 
     frame.values.push(dmxValue);
