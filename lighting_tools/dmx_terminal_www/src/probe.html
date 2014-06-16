@@ -123,7 +123,16 @@ var init = function() {
   f.offset = 11;
   dev.template.addField(f);
 
+  pixels = new Dmx.Device({name:'pixels-01', address: "1.0"});
+  dmxClient.add(pixels);
 
+  f = new Dmx.Field();
+  f.name = 'pixels';
+  f.offset = 0;
+  f.length = 20;
+  f.setBytes(3);
+  pixels.template.addField(f);
+  pixels.set('pixels', [0,0,0]);
 
   //Dmx.emitter.on('change.Device.*', function(evt){ console.log(evt)});
 
@@ -156,11 +165,7 @@ var init = function() {
     options.tileCount = { x: 32, y: 16 };
     options.margins = {inner: {x:1, y:1}, outer: {x:10, y:5}};
     options.defaultTileOpt = {
-      fill: '#B2E9E2',
-      offsetX: 0,
-      //stroke: 'yellow',
-      strokeWidth: 2,
-      dash: [1,1]
+      fill: 'grey'
     };
 
     titleLayer = new Kinetic.Layer(options);
