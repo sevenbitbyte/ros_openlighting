@@ -275,7 +275,7 @@ Ui.TileGrid.prototype.selectCallback = function(evt){
 
   this.update();
 
-  Ui.emitter.emit('select.'+this.globalName+'.hover', pos);
+  Ui.emitter.emit('select.'+this.globalName, pos);
 }
 
 Ui.TileGrid.prototype.hoverCallback = function(evt){

@@ -132,7 +132,15 @@ var init = function() {
   pixels.template.addField(f);
   pixels.set('pixels', [0,0,0]);
 
-  //Dmx.emitter.on('change.Device.*', function(evt){ console.log(evt)});
+  Ui.emitter.on('select.TileGrid.pixels', 
+    function(evt){ 
+      var v = 100* (evt.x + (evt.y * 32)) / (32*16);
+
+      pixels.set('pixels', [v,v,v]);
+      dmxClient.setDevice(pixels);
+      dmxClient.send();
+    }
+  );
 
   var stages = $(".stage");
 
@@ -195,6 +203,7 @@ var init = function() {
     view.mover1 = new Ui.DmxMoverControl(view.stage, c);
 
     options.x += view.mover1.layer.width();
+    options.name = 'pixels';
     view.grid1 = new Ui.TileGrid(view.stage, JSON.parse(JSON.stringify(options)));
 
 
