@@ -124,5 +124,5 @@ install(TARGETS ola_bridge_node
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
 ## Mark other files for installation (e.g. launch and bag files, etc.)
-install(FILES ola_bridge_nodelet.xml
-  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
+#install(FILES ola_bridge_nodelet.xml
+#  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
