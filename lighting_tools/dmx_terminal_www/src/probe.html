@@ -127,14 +127,14 @@ var init = function() {
   f = new Dmx.Field();
   f.name = 'pixels';
   f.offset = 0;
-  f.length = 20;
+  f.length = 60;
   f.setBytes(3);
   pixels.template.addField(f);
   pixels.set('pixels', [0,0,0]);
 
   Ui.emitter.on('select.TileGrid.pixels', 
     function(evt){ 
-      var v = 100* (evt.x + (evt.y * 32)) / (32*16);
+      var v = 255* (evt.x + (evt.y * 32)) / (32*16);
 
       pixels.set('pixels', [v,v,v]);
       dmxClient.setDevice(pixels);
