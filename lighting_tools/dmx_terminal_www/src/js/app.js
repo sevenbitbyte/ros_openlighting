@@ -234,7 +234,7 @@ var runTest = function(){
 $( document ).ready(function() {
 
   ros = new ROSLIB.Ros({
-    url : 'ws://' + window.location.host + ':4000'
+    url : 'ws://' + window.location.hostname + ':4000'
   });
 
   ros.on('connection',

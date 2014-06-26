@@ -1,7 +1,7 @@
 var Dmx={
   emitter: new EventEmitter2({wildcard: true}),
   ros: new ROSLIB.Ros({
-    url : 'ws://' + window.location.host + ':4000'
+    url : 'ws://' + window.location.hostname + ':4000'
   })
 };
 
