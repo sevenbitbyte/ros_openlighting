@@ -24,4 +24,5 @@
   </group>
   
   <node name="rosapi" pkg="rosapi" type="rosapi" />
+  <node name="ola_bridge" pkg="ola_ros" type="ola_bridge_node" />
 </launch>

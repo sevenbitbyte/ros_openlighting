@@ -167,12 +167,16 @@ bool OlaBridge::processCommand(lighting_msgs::run_command::Request& req, lightin
         if( !req.command.name.empty() && _commandBuffer.contains(req.command.name) ){
             _currentCommand = req.command;
             _commandStartTime = now;
+            _loopTimer.setPeriod(ros::Duration(0.1f));
+            _loopTimer.start();
 
             return true;
         }
     }
     else if(req.command.action == lighting_msgs::DmxCommand::STOP){
         _currentCommand.action = lighting_msgs::DmxCommand::STOP;
+        _loopTimer.setPeriod(ros::Duration(0.5f));
+        _loopTimer.start();
         return true;
     }
     else if(req.command.action == lighting_msgs::DmxCommand::REMOVE){

@@ -55,23 +55,28 @@ ROSUtils.MessageFactory.prototype.getMessageDetailsCallback = function(that, typ
                 continue;
               }
 
-              if(fieldType == 'string'){
-                this[fieldName] = String();
-              }
-              else if(fieldType.indexOf('int') > -1){
-                this[fieldName] = Number();
-              }
-              else if(fieldType== 'bool'){
-                this[fieldName] = Boolean();
-              }
-              else if(fieldType.length > 0){
-                if(fieldExample == '{}'){
-                  this[fieldName] = that.createMessage(fieldType);
+                //Handle basic types
+                if(fieldType == 'string'){
+                  this[fieldName] = String();
                 }
-              }
-              else{
-                this[fieldName] = undefined;
-              }
+                else if(fieldType.indexOf('int') > -1){
+                  this[fieldName] = Number(0);
+                }
+                else if(fieldType.indexOf('float') > -1){
+                  this[fieldName] = Number(0.0);
+                }
+                else if(fieldType== 'bool'){
+                  this[fieldName] = Boolean();
+                }
+                else if(fieldType.length > 0){
+                  if(fieldExample == '{}'){
+                    this[fieldName] = that.createMessage(fieldType);
+                  }
+                }
+                else{
+                  //Unsupported type
+                  this[fieldName] = undefined;
+                }
             }
           }
         );
