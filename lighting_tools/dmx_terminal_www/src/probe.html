@@ -48,11 +48,24 @@ var f2;
 var f3;
 var view;
 var dmxClient;
+var ros;
 
 $( document ).ready(function(){
-  Dmx.emitter.on('ready', function(){
-    console.log('dmx live');
-    init();
+  ros=new ROSLIB.Ros({url : 'ws://' + window.location.hostname + ':4000'});
+  ros.on('connection', function(){
+    console.log('ros socket ready');
+
+    Dmx.factory = new ROSUtils.MessageFactory(ros);
+    Dmx.factory.getMessageDetails('lighting_msgs/DmxCommand',
+      function(type){
+        console.log("type: " + type + " ready");
+        Dmx.emitter.emit('ready');
+        init();
+      }
+    );
+
+
+    //init();
   });
 })
 
@@ -63,7 +76,7 @@ var init = function() {
     console.log(value);
   });*/
 
-  dmxClient = new Dmx.CommandClient();
+  dmxClient = new Dmx.CommandClient(ros);
 
   dev = new Dmx.Device({name:'mover-01', address: "1.496"});
   dmxClient.add(dev);
@@ -134,8 +147,8 @@ var init = function() {
   pixels.template.addField(f);
   pixels.set('pixels', [0,0,0]);
 
-  Ui.emitter.on('select.TileGrid.pixels', 
-    function(evt){ 
+  Ui.emitter.on('select.TileGrid.pixels',
+    function(evt){
       var v = 255* (evt.x + (evt.y * 32)) / (32*16);
 
       pixels.set('pixels', [v,v,v]);

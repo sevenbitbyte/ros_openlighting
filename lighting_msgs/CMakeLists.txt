@@ -52,7 +52,7 @@ add_message_files(
 ## Generate services in the 'srv' folder
 add_service_files(
   FILES
-  run_command.srv
+  dmx_command.srv
 )
 
 ## Generate actions in the 'action' folder

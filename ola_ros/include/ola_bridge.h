@@ -5,7 +5,7 @@
 #include <ros/console.h>
 
 #include "olamanager.h"
-#include "lighting_msgs/run_command.h"
+#include "lighting_msgs/dmx_command.h"
 
 class OlaBridge {
     private:
@@ -30,7 +30,7 @@ class OlaBridge {
         void render();
 
     protected:
-        bool processCommand(lighting_msgs::run_command::Request& req, lighting_msgs::run_command::Response& res);
+        bool processCommand(lighting_msgs::dmx_command::Request& req, lighting_msgs::dmx_command::Response& res);
         void renderCallback(const ros::TimerEvent& event);
 
         int renderCmd(lighting_msgs::DmxCommand cmd, QDateTime start, QDateTime now);

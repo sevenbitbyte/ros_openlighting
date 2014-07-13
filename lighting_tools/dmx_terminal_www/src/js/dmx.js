@@ -1,10 +1,11 @@
 var Dmx={
-  emitter: new EventEmitter2({wildcard: true}),
+  emitter: new EventEmitter2({wildcard: true})/*,
   ros: new ROSLIB.Ros({
     url : 'ws://' + window.location.hostname + ':4000'
-  })
+  })*/
 };
 
+/*
 $( document ).ready(
 function() {
   if(Dmx.ros !== undefined){
@@ -29,6 +30,7 @@ function() {
     );
   }
 });
+*/
 
 Dmx.Address = function(options){
   this.universe = 0;
@@ -160,14 +162,14 @@ Dmx.Device.prototype.set = function(name, value){
 }
 
 
-Dmx.CommandClient = function(servicePath){
+Dmx.CommandClient = function(ros, servicePath){
   if(servicePath === undefined){
-    servicePath = '/ola_bridge/run_cmd';
+    servicePath = '/ola_bridge/dmx_cmd';
   }
   this.srvClient = new ROSLIB.Service({
-    ros : Dmx.ros,
+    ros : ros,
     name : servicePath,
-    serviceType : 'lighting_msgs/run_command'
+    serviceType : 'lighting_msgs/dmx_command'
   });
 
   this.command = {};

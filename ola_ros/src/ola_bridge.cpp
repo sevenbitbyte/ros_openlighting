@@ -136,7 +136,7 @@ void OlaBridge::render() {
 }
 
 
-bool OlaBridge::processCommand(lighting_msgs::run_command::Request& req, lighting_msgs::run_command::Response& res) {
+bool OlaBridge::processCommand(lighting_msgs::dmx_command::Request& req, lighting_msgs::dmx_command::Response& res) {
     QDateTime now = QDateTime::currentDateTimeUtc();
 
     std::cout<< "Got a command " << (int)req.command.action
