@@ -4,7 +4,7 @@ OlaBridge::OlaBridge(ros::NodeHandlePtr ptr){
     _nhPtr = ptr;
     _cmdSrv = _nhPtr->advertiseService("dmx_cmd", &OlaBridge::processCommand, this);
 
-    _loopTimer = _nhPtr->createTimer(ros::Duration(0.5f), &OlaBridge::renderCallback, this);
+    _loopTimer = _nhPtr->createTimer(ros::Duration(0.03f), &OlaBridge::renderCallback, this);
 }
 
 OlaBridge::~OlaBridge() {
