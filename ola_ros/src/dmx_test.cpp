@@ -1,7 +1,7 @@
 #include <ros/ros.h>
 #include <ros/console.h>
 
-#include "lighting_msgs/run_command.h"
+#include "lighting_msgs/dmx_command.h"
 
 #define TRANSITION_MS (2000.0f)
 #define FADE_TIME_MS (5000.0f)
