@@ -91,9 +91,9 @@ int main(int argc, char** argv){
     frame0.values.push_back(valueTemp);
     dispCmd.layers.push_back(frame0);*/
 
-    ros::ServiceClient client = _nhPtr->serviceClient<lighting_msgs::run_command::Request>("/ola_bridge/run_cmd");
+    ros::ServiceClient client = _nhPtr->serviceClient<lighting_msgs::dmx_command::Request>("/ola_bridge/dmx_cmd");
 
-    lighting_msgs::run_command srv;
+    lighting_msgs::dmx_command srv;
     srv.request.command = renderSnake(1);
 
     if(client.call(srv)){

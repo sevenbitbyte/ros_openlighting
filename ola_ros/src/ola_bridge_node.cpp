@@ -3,7 +3,7 @@
 
 #include "olamanager.h"
 #include "ola_bridge.h"
-#include "lighting_msgs/run_command.h"
+//#include "lighting_msgs/dmx_command.h"
 
 
 using namespace std;
