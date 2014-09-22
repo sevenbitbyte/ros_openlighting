@@ -47,7 +47,8 @@ void OlaBridge::renderDmxEasing(lighting_msgs::DmxEasing easing, qreal progress)
         ola::DmxBuffer* buf = _ola.getBuffer(start.universe);
 
         for(int j=0; j<start.data.size(); j++){
-            qreal d = ((qreal)end.data[j] - (qreal)start.data[j]) * value;
+            qreal d = (((qreal)end.data[j] - (qreal)start.data[j]) * value) + start.data[j];
+
             buf->SetChannel(j + start.offset, (uint8_t)d);
         }
     }
@@ -74,7 +75,9 @@ int OlaBridge::renderCmd(lighting_msgs::DmxCommand cmd, QDateTime start, QDateTi
                 qreal easingDurationMs = easing.durationMs;
 
                 qreal easingProgress = (deltaMs - easingDelayMs) / easingDurationMs;
-                renderDmxEasing(easing, easingProgress);
+                if(easingProgress >= 0.0f && easingProgress <= 1.0f){
+                    renderDmxEasing(easing, easingProgress);
+                }
             }
             activeFrames++;
         }
