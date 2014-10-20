@@ -63,6 +63,7 @@ set(OLA_BRIDGE_NODE_SOURCE
   src/ola_bridge_node.cpp
   src/utils.cpp
   src/ledrun.cpp
+  src/pixel_mapper.cpp
   src/olamanager.cpp
   src/ola_bridge.cpp
 )
@@ -70,6 +71,7 @@ set(OLA_BRIDGE_NODE_SOURCE
 set(OLA_BRIDGE_NODE_HEADERS
   include/utils.h
   include/ledrun.h
+  include/pixel_mapper.h
   include/olamanager.h
   include/ola_bridge.h
 )
@@ -79,7 +81,7 @@ set(DMX_TEST_NODE_SOURCE
 )
 
 ## Create node binaries
-add_executable(ola_bridge_node ${OLA_BRIDGE_NODE_SOURCE})
+add_executable(ola_bridge_node ${OLA_BRIDGE_NODE_SOURCE} ${OLA_BRIDGE_NODE_HEADERS})
 
 target_link_libraries(ola_bridge_node
   ${catkin_LIBRARIES}

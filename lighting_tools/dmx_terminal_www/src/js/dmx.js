@@ -66,17 +66,12 @@ Dmx.Address.prototype.set = function(options){
 
 Dmx.Field = function(options){
   this.offset = 0;
-  this.length = 1;
   this.bytes = 1;
+  this.chunkSize = 1;
   this.name = '';
-  this.min = 0;
+  /*this.min = 0;
   this.default = 0;
-  this.max = Math.pow(2, 8*this.bytes)-1;
-}
-
-Dmx.Field.prototype.setBytes = function(count){
-  this.bytes = count;
-  this.max = Math.pow(2, 8*this.bytes)-1;
+  this.max = Math.pow(2, 8*this.bytes)-1;*/
 }
 
 Dmx.Field.prototype.computeValue = function(value){
@@ -156,7 +151,7 @@ Dmx.Device.prototype.update = function(){
 Dmx.Device.prototype.set = function(name, value){
   console.log("Dmx.Device.setField() - " + name + ',' + value)
   f = this.getField(name);
-  this.values[f.name] = f.computeValue(value);
+  this.values[f.name] = value;
 
   Dmx.emitter.emit('change.Device.'+this.name, {device:this, field:f});
 }

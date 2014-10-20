@@ -3,12 +3,28 @@
 OlaBridge::OlaBridge(ros::NodeHandlePtr ptr){
     _nhPtr = ptr;
     _cmdSrv = _nhPtr->advertiseService("dmx_cmd", &OlaBridge::processCommand, this);
+    _devCreateSrv = _nhPtr->advertiseService("create_dmx_device", &OlaBridge::createDmxDevice, this);
+    _setPixelMapSrv = _nhPtr->advertiseService("set_pixelmap", &OlaBridge::updatePixelMap, this);
+    _devListSrv = _nhPtr->advertiseService("device_list", &OlaBridge::deviceList, this);
 
     _loopTimer = _nhPtr->createTimer(ros::Duration(0.03f), &OlaBridge::renderCallback, this);
 }
 
 OlaBridge::~OlaBridge() {
-    //
+    _loopTimer.stop();
+    _cmdSrv.shutdown();
+    _devCreateSrv.shutdown();
+    _setPixelMapSrv.shutdown();
+
+    while(!_pixelMapper.empty()){
+        PixelMapper* mapper = _pixelMapper.last();
+        _pixelMapper.remove(_pixelMapper.lastKey());
+        delete mapper;
+    }
+}
+
+OlaManager* OlaBridge::getOla(){
+    return &_ola;
 }
 
 void OlaBridge::renderCallback(const ros::TimerEvent& event) {
@@ -138,6 +154,73 @@ void OlaBridge::render() {
     }
 }
 
+bool OlaBridge::createDmxDevice(lighting_msgs::create_dmx_device::Request& req, lighting_msgs::create_dmx_device::Response& res){
+    QString devName(req.device.name.c_str());
+
+    if(_devices.contains(devName)){
+        res.error = "Device name in use";
+        return true;
+    }
+    else if(devName.isEmpty()){
+        res.error = "Empty device names not allowed";
+        return true;
+    }
+
+    _devices.insert(devName, req.device);
+
+    return true;
+}
+
+bool OlaBridge::updatePixelMap(lighting_msgs::set_pixelmap::Request& req, lighting_msgs::set_pixelmap::Response& res){
+    QString devName = req.device_name.c_str();
+
+    if(!_devices.contains(devName)){
+        res.error = "Device does not exist";
+        return true;
+    }
+
+    if(!_pixelMapper.contains(devName)){
+        //Register new pixel map
+        PixelMapper* p = new PixelMapper(_nhPtr, devName, getOla());
+        _pixelMapper.insert(devName, p);
+    }
+
+    PixelMapper* mapper = _pixelMapper[devName];
+
+    if(mapper==NULL){
+        res.error = "Failed to locate pixelmaper";
+        return true;
+    }
+
+
+    //Parse mapping json blob and update pixelmap
+    QByteArray jsonText(req.mapping.c_str());
+    QJsonParseError error;
+    QJsonDocument json = QJsonDocument::fromJson(jsonText, &error);
+
+    if(error.error != QJsonParseError::NoError){
+        QByteArray temp = error.errorString().toLocal8Bit();
+        res.error = temp.data();
+    }
+    else if(!mapper->fromJson(json)){
+        res.error = "Malformed pixel mapping";
+    }
+
+
+    QByteArray topicTemp = mapper->topicPath().toLocal8Bit();
+    res.topic = topicTemp.data();
+
+    return true;
+}
+
+bool OlaBridge::deviceList(lighting_msgs::device_list::Request& req, lighting_msgs::device_list::Response& res){
+
+    foreach(lighting_msgs::DmxDevice device, _devices){
+        res.devices.push_back(device);
+    }
+
+    return true;
+}
 
 bool OlaBridge::processCommand(lighting_msgs::dmx_command::Request& req, lighting_msgs::dmx_command::Response& res) {
     QDateTime now = QDateTime::currentDateTimeUtc();

@@ -5,6 +5,7 @@
   <arg name="certfile" />
   <arg name="keyfile" />
   <arg name="authenticate" default="false" />
+  <param name="enable_statistics" type="bool" value="true"/>
   
   <group if="$(arg ssl)">
     <node name="rosbridge_websocket" pkg="rosbridge_server" type="rosbridge_websocket" output="screen">
@@ -12,7 +13,7 @@
       <param name="keyfile" value="$(arg keyfile)" />
       <param name="authenticate" value="$(arg authenticate)" />
       <param name="port" value="$(arg port)"/>
-      <param name="address" value="$(arg address)"/>
+      -<param name="address" value="$(arg address)"/>
     </node>
   </group>
   <group unless="$(arg ssl)">
@@ -25,4 +26,9 @@
   
   <node name="rosapi" pkg="rosapi" type="rosapi" />
   <node name="ola_bridge" pkg="ola_ros" type="ola_bridge_node" />
+  <node name="point_downsample" pkg="point_downsample" type="point_downsample_node"/>
+  <node name="rosserial" pkg="rosserial_python" type="serial_node.py">
+    <param name="port" value="/dev/ttyACM0" />
+    <param name="baud" value="115200" />
+  </node>
 </launch>

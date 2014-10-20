@@ -37,8 +37,6 @@ class OlaManager/* : public QObject*/
     public slots:
         void sendBuffers();
 
-        
-
     private:
         ola::StreamingClient* _client;
         QMap<int,ola::DmxBuffer*> _buffers;

@@ -47,12 +47,17 @@ add_message_files(
   DmxFrame.msg
   DmxValue.msg
   DmxStatus.msg
+  DmxAddress.msg
+  DmxDevice.msg
 )
 
 ## Generate services in the 'srv' folder
 add_service_files(
   FILES
   dmx_command.srv
+  create_dmx_device.srv
+  set_pixelmap.srv
+  device_list.srv
 )
 
 ## Generate actions in the 'action' folder
