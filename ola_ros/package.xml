@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package>
   <name>ola_ros</name>
-  <version>0.1.0</version>
+  <version>0.1.1</version>
   <description>This package contains ROS wrappers of OLA functionality</description>
   <maintainer email="alan.meekins@gmail.com">Alan Meekins</maintainer>
   <license>BSD</license>
