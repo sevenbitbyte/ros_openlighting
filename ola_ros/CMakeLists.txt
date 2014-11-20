@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(ola_ros)
 
-find_package(catkin REQUIRED COMPONENTS lighting_msgs roscpp rospy std_msgs genmsg)
+find_package(catkin REQUIRED COMPONENTS lighting_msgs roscpp std_msgs genmsg)
 
 #set(CMAKE_BUILD_TYPE Debug)
 set(ROS_BUILD_TYPE Debug)
@@ -11,7 +11,7 @@ set(ROS_BUILD_TYPE Debug)
 catkin_package(
   INCLUDE_DIRS include
  # LIBRARIES nodelet_ola_bridge
-  CATKIN_DEPENDS lighting_msgs nodelet roscpp std_msgs
+  CATKIN_DEPENDS lighting_msgs roscpp std_msgs
 )
 
 
@@ -94,7 +94,7 @@ add_dependencies(ola_bridge_node lighting_msgs_gencpp)
 
 qt5_use_modules(ola_bridge_node Core Gui Widgets Sql Network)
 
-## Create node binaries
+## Create test binary
 add_executable(dmx_test ${DMX_TEST_NODE_SOURCE})
 
 target_link_libraries(dmx_test
@@ -103,28 +103,10 @@ target_link_libraries(dmx_test
 
 add_dependencies(dmx_test lighting_msgs_gencpp)
 
-## Create the nodelet library
-#add_library(ola_bridge_nodelet ${OLA_BRIDGE_NODELET_SOURCE})
 
-#target_link_libraries(ola_bridge_nodelet
-#  ${catkin_LIBRARIES}
-#  ola
-#  olacommon
-#  ${PROTOBUF_LIBRARY}
-#)
-
-#qt5_use_modules(ola_bridge_nodelet Core Gui Widgets Sql Network)
-
-if(catkin_EXPORTED_LIBRARIES)
- # add_dependencies(ola_bridge_nodelet ${catkin_EXPORTED_LIBRARIES})
-endif()
-
-## Mark the nodelet library for installations
+## Mark the executable
 install(TARGETS ola_bridge_node
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
-## Mark other files for installation (e.g. launch and bag files, etc.)
-#install(FILES ola_bridge_nodelet.xml
-#  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
