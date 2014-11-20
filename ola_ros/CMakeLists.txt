@@ -16,7 +16,6 @@ catkin_package(
 
 
 ## Find protobuf
-include(FindProtobuf)
 find_package(Protobuf REQUIRED)
 
 ## Find Qt
