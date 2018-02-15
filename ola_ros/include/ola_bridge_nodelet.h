@@ -47,8 +47,8 @@ namespace ola_ros {
             ola::OlaCallbackClientWrapper _client;
     };
 
-    //PLUGINLIB_EXPORT_CLASS(ola_ros::OlaBridge, nodelet::Nodelet);
-    PLUGINLIB_DECLARE_CLASS(ola_ros, OlaBridge, ola_ros::OlaBridge, nodelet::Nodelet);
+    PLUGINLIB_EXPORT_CLASS(ola_ros::OlaBridge, nodelet::Nodelet);
+    //PLUGINLIB_DECLARE_CLASS(ola_ros, OlaBridge, ola_ros::OlaBridge, nodelet::Nodelet);
 }
 
 
