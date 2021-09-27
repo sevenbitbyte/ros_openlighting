@@ -42,7 +42,7 @@
     </script>
 
 <script>
-var dev;
+var mover;
 var f1;
 var f2;
 var f3;
@@ -78,82 +78,74 @@ var init = function() {
 
   dmxClient = new Dmx.CommandClient(ros);
 
-  dev = new Dmx.Device({name:'mover-01', address: "1.496"});
-  dmxClient.add(dev);
 
-  f = new Dmx.Field();
-  f.name = 'mode';
-  f.offset = 0;
-  dev.template.addField(f);
-  dev.set('mode', 255);
+  mover = new Dmx.Device({name:'mover-01', address: "1.496"});
 
-  f = new Dmx.Field();
-  f.name = 'intensity';
-  f.offset = 1;
-  dev.template.addField(f);
+  mover.template.addField(new Dmx.Field({ name: 'pan', offset: 2, bytes: 2}))
+  mover.template.addField(new Dmx.Field({ name: 'tilt', offset: 4, bytes: 2}))
+  mover.template.addField(new Dmx.Field({ name: 'mode', offset: 0, bytes: 1, defaultVal: 255}))
+  mover.template.addField(new Dmx.Field({ name: 'intensity', offset: 1, bytes: 1}))
+  mover.template.addField(new Dmx.Field({ name: 'zoom', offset: 13, bytes: 1}))
+  mover.template.addField(new Dmx.Field({ name: 'wheel', offset: 7, bytes: 1}))
+  mover.template.addField(new Dmx.Field({name: 'color', offset: 8, length: 1, bytes: 3, format: 'rgb'}))
+  /*mover.template.addField(new Dmx.Field({ name: 'red', offset: 8, bytes: 1}))
+  mover.template.addField(new Dmx.Field({ name: 'green', offset: 9, bytes: 1}))
+  mover.template.addField(new Dmx.Field({ name: 'blue', offset: 10, bytes: 1}))*/
+  mover.template.addField(new Dmx.Field({ name: 'white', offset: 11, bytes: 1}))
+  mover.set('mode', [255]);
+  blinder.set('color', [0,0,0])
+  dmxClient.add(mover);
 
-  f = new Dmx.Field();
-  f.name = 'pan';
-  f.offset = 2;
-  f.setBytes(2);
-  dev.template.addField(f);
-  //dev.set('pan', f.computeValue(0));
-
-  f = new Dmx.Field();
-  f.name = 'tilt';
-  f.offset = 4;
-  f.setBytes(2);
-  dev.template.addField(f);
-  //dev.set('tilt', f.computeValue(0));
-
-  f = new Dmx.Field();
-  f.name = 'zoom';
-  f.offset = 13;
-  dev.template.addField(f);
-
-  f = new Dmx.Field();
-  f.name = 'wheel';
-  f.offset = 7;
-  dev.template.addField(f);
-
-  f = new Dmx.Field();
-  f.name = 'red';
-  f.offset = 8;
-  dev.template.addField(f);
-
-  f = new Dmx.Field();
-  f.name = 'green';
-  f.offset = 9;
-  dev.template.addField(f);
-
-  f = new Dmx.Field();
-  f.name = 'blue';
-  f.offset = 10;
-  dev.template.addField(f);
-
-  f = new Dmx.Field();
-  f.name = 'white';
-  f.offset = 11;
-  dev.template.addField(f);
+  let blinder = new Dmx.Device({name:'blinder-01', address: "1.399"})
+  blinder.template.addField(new Dmx.Field({ name: 'fun', offset: 0, bytes: 1, defaultVal: 255}))
+  blinder.template.addField(new Dmx.Field({ name: 'color', offset: 1, length: 1, bytes: 3, defaultVal: 0, format: 'rgb'}))
+  blinder.template.addField(new Dmx.Field({ name: 'left-color', offset: 4, length: 1, bytes: 3, format: 'rgb'}))
+  blinder.template.addField(new Dmx.Field({ name: 'center-color', offset: 7, length: 1, bytes: 3, format: 'rgb'}))
+  blinder.template.addField(new Dmx.Field({ name: 'right-color', offset: 10, length: 1, bytes: 3, format:'rgb'}))
+  blinder.set('color', [0,0,0])
+  blinder.set('left-color', [0,0,0])
+  blinder.set('center-color', [0,0,0])
+  blinder.set('right-color', [0,0,0])
+  dmxClient.add(blinder);
 
   pixels = new Dmx.Device({name:'pixels-01', address: "1.0"});
   dmxClient.add(pixels);
 
-  f = new Dmx.Field();
-  f.name = 'pixels';
-  f.offset = 0;
-  f.length = 60;
-  f.setBytes(3);
-  pixels.template.addField(f);
-  pixels.set('pixels', [0,0,0]);
+  pixels.template.addField(new Dmx.Field({name: 'kitchen', offset: 0, length: 1, bytes: 3, format: 'rbg'}))
+  pixels.template.addField(new Dmx.Field({name: 'fridge', length: 8, bytes: 3, format: 'rbg', offset: pixels.getField('kitchen').nextOffset}))
+  pixels.template.addField(new Dmx.Field({name: 'top', length: 36, bytes: 3, format: 'rbg', offset: pixels.getField('fridge').nextOffset}))
+  pixels.template.addField(new Dmx.Field({name: 'window', length: 8, bytes: 3, format: 'rbg', offset: pixels.getField('top').nextOffset}))
+  pixels.template.addField(new Dmx.Field({name: 'couch', length: 25, bytes: 3, format: 'rbg', offset: pixels.getField('window').nextOffset}))
+  pixels.template.addField(new Dmx.Field({name: 'bottom', length: 20, bytes: 3, format: 'rbg', offset: pixels.getField('couch').nextOffset}))
+  pixels.set('top', [20,20,20])
+  pixels.set('kitchen', [0,00,40])
+  pixels.set('fridge', [50,150,50])
+  pixels.set('window', [0,10,0])
+  pixels.set('couch', [80,0,80])
+  pixels.set('bottom', [80,180,80])
+
+  dmxClient.setDevice(pixels)
+  dmxClient.send()
+
 
   Ui.emitter.on('select.TileGrid.pixels',
     function(evt){
       var v = 255* (evt.x + (evt.y * 32)) / (32*16);
 
-      pixels.set('pixels', [v,v,v]);
+      blinder.set('right-color', [v,v/2,v/2])
+      blinder.set('center-color', [v,v,v])
+      blinder.set('left-color', [v,v/2,v/2])
+      //blinder.set('left-color', [v,0,0])
+      //blinder.set('center-color', [0,v,0])
+      //blinder.set('right-color', [0,0,v])
+
+      pixels.set('top', [v,v,v])
+      pixels.set('kitchen', [v,v,v])
+      pixels.set('fridge', [v,v,v])
+      pixels.set('bottom', [v,v,v])
       dmxClient.setDevice(pixels);
-      dmxClient.send();
+      dmxClient.setDevice(blinder);
+      dmxClient.send()
     }
   );
 
@@ -214,7 +206,7 @@ var init = function() {
 
     moverMargins = {inner: {x: 0, y: 10}, outer: {x:10, y:5}};
     var c = JSON.parse(JSON.stringify({name: options.name, x: options.x, y: options.y, margins: moverMargins, width: 200, height:300}));
-    c.device = dev;
+    c.device = mover;
     view.mover1 = new Ui.DmxMoverControl(view.stage, c);
 
     options.x += view.mover1.layer.width();

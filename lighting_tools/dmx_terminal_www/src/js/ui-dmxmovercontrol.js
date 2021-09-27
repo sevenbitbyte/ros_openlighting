@@ -161,12 +161,12 @@ Ui.DmxMoverControl.prototype.setupEventHandlers = function(){
   polarPath = 'change.PolarInput.'+this.name+'.pan-tilt.hover';
   Ui.emitter.on( polarPath,
     function(value){
-      console.log('polar input changed');
+      console.log('polar input hover');
       console.log(value);
 
-      device.set('pan', value.theta);
-      device.set('tilt', (1-value.r) / 2);
-      device.update();
+      //device.set('pan', value.theta);
+      //device.set('tilt', (1-value.r) / 2);
+      //device.update();
     }
   );
 
